@@ -20,25 +20,37 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\burner.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\earth.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\end.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\landerdead.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\lander.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="olcPixelGameEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\gfx\burner.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\gfx\earth.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\gfx\end.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\gfx\ground.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\gfx\lander.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\gfx\landerDestroyed.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\gfx\landerHeavyDamage.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\gfx\landerLightDamage.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\gfx\landerMediumDamage.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

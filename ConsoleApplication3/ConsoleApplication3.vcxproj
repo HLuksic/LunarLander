@@ -143,14 +143,18 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\burner.png" />
-    <Image Include="..\earth.png" />
-    <Image Include="..\end.png" />
-    <Image Include="..\lander.png" />
-    <Image Include="..\landerdead.png" />
+    <ClInclude Include="olcPixelGameEngine.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="olcPixelGameEngine.h" />
+    <Image Include="..\gfx\burner.png" />
+    <Image Include="..\gfx\earth.png" />
+    <Image Include="..\gfx\end.png" />
+    <Image Include="..\gfx\ground.png" />
+    <Image Include="..\gfx\lander.png" />
+    <Image Include="..\gfx\landerDestroyed.png" />
+    <Image Include="..\gfx\landerHeavyDamage.png" />
+    <Image Include="..\gfx\landerLightDamage.png" />
+    <Image Include="..\gfx\landerMediumDamage.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

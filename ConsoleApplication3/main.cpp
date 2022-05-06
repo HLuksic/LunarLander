@@ -30,17 +30,17 @@ public:
 private:
 	int screenHeight;
 	int screenWidth;
-	int	playerLandings;
-	int normalizedHorizontalVelocity;
-	int normalizedVerticalVelocity;
+	int playerLandings;
 	float playerAngle;
 	float playerAltitude;
 	float playerThrust;
 	float playerScore;
 	float playerFuel;
+	bool playerDead;
+	int normalizedHorizontalVelocity;
+	int normalizedVerticalVelocity;
 	float scale;
 	float currentSegmentAngle;
-	bool playerDead;
 	bool titleScreen;
 	bool paused;
 
@@ -367,7 +367,7 @@ public:
 				playerPos = { (float)screenWidth / 2, (float)screenHeight / 2 };
 				playerVel = { 0.0f, 0.0f };
 				adjustedPos = { playerPos / 2 };
-				earthPos = { RandFloat(10.0f, screenWidth - 10.0f), RandFloat(10.0f, screenHeight / 3) };
+				earthPos = { RandFloat(100.0f, 400.0f), RandFloat(100.0f, 150.0f) };
 				playerAngle = 0.0f;
 				playerThrust = 0.0f;
 				playerScore = 0.0f;
@@ -772,7 +772,7 @@ public:
 				);
 
 			// Crew chatter
-			if (time > randomTime / 2 && time < randomTime / 2 + 5.0f && playerAltitude > 4.0f)
+			if (time > randomTime / 2 && time < randomTime / 2 + 7.0f && playerAltitude > 4.0f)
 				DrawStringDecal(
 					{ screenWidth * 0.05f, screenHeight * 0.35f },
 					crew[randomName] + crew[randomCrewChatter], 
@@ -861,7 +861,7 @@ public:
 			Draw(fElapsedTime);
 			CrewComms(fElapsedTime);
 			Physics(fElapsedTime);
-			//debug();
+			//Debug();
 		}
 		return true;
 	}
@@ -870,8 +870,9 @@ public:
 int main() {
 
 	lunarLander game;
-		if (game.Construct(550, 400, 2, 2/*300, 240, 3, 3*/))
-			game.Start();
+	
+	if (game.Construct(550, 400, 2, 2/*300, 240, 3, 3*/))
+		game.Start();
 
 	return 0;
 }

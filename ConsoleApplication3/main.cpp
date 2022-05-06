@@ -1,4 +1,5 @@
 ﻿#define OLC_PGE_APPLICATION
+#define DEBUG
 
 #include <iostream>
 #include <random>
@@ -145,29 +146,33 @@ public:
 		return atan2(node2.y - node1.y, node2.x - node1.x);
 	}
 
+	#ifdef DEBUG
 	void Debug()
 	{
-		 // Highlight leftmost and rightmost segments
-		DrawLine(
-			deqSegments.front().leftNode * scale + adjustedPos, 
-			deqSegments.front().rightNode * scale + adjustedPos, 
-			olc::GREEN
-		);
-		DrawCircle(
-			deqSegments.front().rightNode * scale + adjustedPos, 
-			5, 
-			olc::GREEN
-		);
-		DrawLine(
-			deqSegments.back().leftNode * scale + adjustedPos, 
-			deqSegments.back().rightNode * scale + adjustedPos, 
-			olc::RED
-		);
-		DrawCircle(
-			deqSegments.back().leftNode * scale + adjustedPos, 
-			5, 
-			olc::RED
-		);
+		// Highlight leftmost and rightmost segments
+		if (!deqSegments.empty())
+		{
+			DrawLine(
+				deqSegments.front().leftNode * scale + adjustedPos, 
+				deqSegments.front().rightNode * scale + adjustedPos, 
+				olc::GREEN
+			);
+			DrawCircle(
+				deqSegments.front().rightNode * scale + adjustedPos, 
+				5, 
+				olc::GREEN
+			);
+			DrawLine(
+				deqSegments.back().leftNode * scale + adjustedPos, 
+				deqSegments.back().rightNode * scale + adjustedPos, 
+				olc::RED
+			);
+			DrawCircle(
+				deqSegments.back().leftNode * scale + adjustedPos, 
+				5, 
+				olc::RED
+			);
+		}
 		// Highlight segment & exact point under player
 		for (auto& segment : deqSegments)
 		{
@@ -185,9 +190,11 @@ public:
 		}
 		// Player collision circle
 		DrawCircle(playerPos * scale + adjustedPos, int(7 * scale), olc::RED);
+		// Deque sizes
 		DrawString(50, 50, std::to_string(deqSegments.size()));
 		DrawString(60, 60, std::to_string(deqBgSegments.size()));
 	}
+	#endif
 	
 	void Physics(float fElapsedTime) 
 	{ 
@@ -861,7 +868,10 @@ public:
 			Draw(fElapsedTime);
 			CrewComms(fElapsedTime);
 			Physics(fElapsedTime);
-			//Debug();
+
+			#ifdef DEBUG
+			Debug();
+			#endif
 		}
 		return true;
 	}

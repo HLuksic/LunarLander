@@ -28,21 +28,21 @@ public:
 	}
 
 private:
-	int screen_height;
-	int screen_width;
-	int	player_landings;
-	int normHVel;
-	int normVVel;
-	float player_angle;
-	float player_altitude;
-	float player_thrust;
-	float player_score;
-	float player_fuel;
+	int screenHeight;
+	int screenWidth;
+	int	playerLandings;
+	int normalizedHorizontalVelocity;
+	int normalizedVerticalVelocity;
+	float playerAngle;
+	float playerAltitude;
+	float playerThrust;
+	float playerScore;
+	float playerFuel;
 	float scale;
-	float current_seg_angle;
-	bool player_dead;
-	bool title;
-	bool pause;
+	float currentSegmentAngle;
+	bool playerDead;
+	bool titleScreen;
+	bool paused;
 
 	std::unique_ptr<olc::Sprite> sprPlayer;
 	std::unique_ptr<olc::Sprite> sprPlayerLightDamage;
@@ -63,14 +63,14 @@ private:
 	std::unique_ptr<olc::Decal> decEnd;
 	std::unique_ptr<olc::Decal> decSurface;
 
-	olc::vf2d player_pos;
-	olc::vf2d player_vel;
-	olc::vf2d earth_pos;
-	olc::vf2d adj_pos;
+	olc::vf2d playerPos;
+	olc::vf2d playerVel;
+	olc::vf2d earthPos;
+	olc::vf2d adjustedPos;
 
 	struct sSegment {
-		olc::vf2d leftnode;
-		olc::vf2d rightnode;
+		olc::vf2d leftNode;
+		olc::vf2d rightNode;
 		float angle;
 		bool visited;
 	};
@@ -91,25 +91,25 @@ public:
 	{
 		srand((unsigned int)time(0));
 
-		screen_height = ScreenHeight();
-		screen_width = ScreenWidth();
+		screenHeight = ScreenHeight();
+		screenWidth = ScreenWidth();
 
 		// Player
-		player_angle = 0.0f;
-		player_pos = { (float)screen_width / 2, (float)screen_height / 2 };
-		player_vel = { 0.0f, 0.7f };
-		player_thrust = 0.0f;
-		player_score = 0;
-		player_fuel = 2250;
-		player_landings = 0;
-		player_dead = false;
-		pause = false;
-		title = true;
+		playerAngle = 0.0f;
+		playerPos = { (float)screenWidth / 2, (float)screenHeight / 2 };
+		playerVel = { 0.0f, 0.7f };
+		playerThrust = 0.0f;
+		playerScore = 0;
+		playerFuel = 2250;
+		playerLandings = 0;
+		playerDead = false;
+		paused = false;
+		titleScreen = true;
 
 		// Environment
-		adj_pos = player_pos / 2;
+		adjustedPos = playerPos / 2;
 		scale = 0.5f;
-		earth_pos = { RandFloat(100.0f, 400.0f), RandFloat(100.0f, 150.0f) };
+		earthPos = { RandFloat(100.0f, 400.0f), RandFloat(100.0f, 150.0f) };
 
 		// Sprites
 		sprPlayerLightDamage = std::make_unique<olc::Sprite>("../gfx/landerLightDamage.png");
@@ -147,42 +147,44 @@ public:
 
 	void Debug()
 	{
-		 // Highlight front() and back() segment
+		 // Highlight leftmost and rightmost segments
 		DrawLine(
-			deqSegments.front().leftnode * scale + adj_pos, 
-			deqSegments.front().rightnode * scale + adj_pos, 
-			olc::GREEN);
+			deqSegments.front().leftNode * scale + adjustedPos, 
+			deqSegments.front().rightNode * scale + adjustedPos, 
+			olc::GREEN
+		);
 		DrawCircle(
-			deqSegments.front().rightnode * scale + adj_pos, 
+			deqSegments.front().rightNode * scale + adjustedPos, 
 			5, 
-			olc::GREEN);
+			olc::GREEN
+		);
 		DrawLine(
-			deqSegments.back().leftnode * scale + adj_pos, 
-			deqSegments.back().rightnode * scale + adj_pos, 
-			olc::RED);
+			deqSegments.back().leftNode * scale + adjustedPos, 
+			deqSegments.back().rightNode * scale + adjustedPos, 
+			olc::RED
+		);
 		DrawCircle(
-			deqSegments.back().leftnode * scale + adj_pos, 
+			deqSegments.back().leftNode * scale + adjustedPos, 
 			5, 
-			olc::RED);
-
-		// Highlight segment & point under player
+			olc::RED
+		);
+		// Highlight segment & exact point under player
 		for (auto& segment : deqSegments)
 		{
-			if (segment.leftnode.x < player_pos.x && segment.rightnode.x > player_pos.x)
+			if (segment.leftNode.x < playerPos.x && segment.rightNode.x > playerPos.x)
 			{
-				DrawCircle(segment.leftnode * scale + adj_pos, 5, olc::YELLOW);
-				DrawCircle(segment.rightnode * scale + adj_pos, 5, olc::YELLOW);
+				DrawCircle(segment.leftNode * scale + adjustedPos, 5, olc::YELLOW);
+				DrawCircle(segment.rightNode * scale + adjustedPos, 5, olc::YELLOW);
 		
-				float diffy = segment.rightnode.y - segment.leftnode.y;
-				float diffx = segment.rightnode.x - segment.leftnode.x;
-				float mult = (player_pos.x - segment.leftnode.x) / diffx;
-				olc::vf2d newpoint = { player_pos.x, segment.leftnode.y + diffy * mult };
-				DrawCircle(newpoint * scale + adj_pos, 5, olc::YELLOW);
+				float diffy = segment.rightNode.y - segment.leftNode.y;
+				float diffx = segment.rightNode.x - segment.leftNode.x;
+				float mult = (playerPos.x - segment.leftNode.x) / diffx;
+				olc::vf2d newpoint = { playerPos.x, segment.leftNode.y + diffy * mult };
+				DrawCircle(newpoint * scale + adjustedPos, 5, olc::YELLOW);
 			}
 		}
-
 		// Player collision circle
-		DrawCircle(player_pos * scale + adj_pos, int(7 * scale), olc::RED);
+		DrawCircle(playerPos * scale + adjustedPos, int(7 * scale), olc::RED);
 		DrawString(50, 50, std::to_string(deqSegments.size()));
 		DrawString(60, 60, std::to_string(deqBgSegments.size()));
 	}
@@ -192,57 +194,60 @@ public:
 		static float Time = 0.0f;
 
 		// Divide by 3 for believable velocity, this is what's displayed
-		normHVel = abs((int)(player_vel.x / 3));
-		normVVel = abs((int)(player_vel.y / 3));
+		normalizedHorizontalVelocity = abs((int)(playerVel.x / 3));
+		normalizedVerticalVelocity = abs((int)(playerVel.y / 3));
 
-		if (!pause) // Disable everything if paused
+		if (!paused) // Disable everything if paused
 		{
 			// Angle reset if full circle
-			if (abs(player_angle) > 6.283f) player_angle = 0.0f;
+			if (abs(playerAngle) > 6.283f) playerAngle = 0.0f;
 
 			// Directional velocity
-			player_vel += { player_thrust * cos(player_angle + PI * 0.5f) * fElapsedTime,
-							player_thrust * sin(player_angle + PI * 0.5f) * fElapsedTime };
+			playerVel += { 
+				playerThrust * cos(playerAngle + PI * 0.5f) * fElapsedTime, 
+				playerThrust * sin(playerAngle + PI * 0.5f) * fElapsedTime 
+			};
 		
 			// Gravity
-			player_vel.y += 15.0f * fElapsedTime;
+			playerVel.y += 15.0f * fElapsedTime;
 
-			// 1 score per second, this is why score is float
-			player_score += fElapsedTime;
+			// +1 score per second, this is why score is float
+			playerScore += fElapsedTime;
 
-			// Player is stationary, world moves inversely
+			// Player is stationary, terrain moves inversely
 			for (auto& segment : deqSegments)
 			{
-				segment.leftnode += player_vel * -1.0f * fElapsedTime;
-				segment.rightnode += player_vel * -1.0f * fElapsedTime;
+				segment.leftNode += playerVel * -1.0f * fElapsedTime;
+				segment.rightNode += playerVel * -1.0f * fElapsedTime;
 			}
 
+			// Background moves slower than foreground
 			for (auto& segment : deqBgSegments)
 			{
-				segment.leftnode += player_vel * -0.3f * fElapsedTime;
-				segment.rightnode += player_vel * -0.3f * fElapsedTime;
+				segment.leftNode += playerVel * -0.3f * fElapsedTime;
+				segment.rightNode += playerVel * -0.3f * fElapsedTime;
 			}
 
-			if (GetKey(olc::Key::W).bHeld && (int)player_fuel)
+			if (GetKey(olc::Key::W).bHeld && (int)playerFuel)
 			{
-				player_thrust = -40.0f;
-				player_fuel -= 100.0f * fElapsedTime;
+				playerThrust = -40.0f;
+				playerFuel -= 100.0f * fElapsedTime;
 			}
 			else 
 			{
-				player_thrust = 0.0f;
+				playerThrust = 0.0f;
 			}
 
-			if (GetKey(olc::Key::A).bHeld && (int)player_fuel)
+			if (GetKey(olc::Key::A).bHeld && (int)playerFuel)
 			{
-				player_angle -= 1.5f * fElapsedTime;
-				player_fuel -= 10.0f * fElapsedTime;
+				playerAngle -= 1.5f * fElapsedTime;
+				playerFuel -= 10.0f * fElapsedTime;
 			}
 			
-			if (GetKey(olc::Key::D).bHeld && (int)player_fuel)
+			if (GetKey(olc::Key::D).bHeld && (int)playerFuel)
 			{
-				player_angle += 1.5f * fElapsedTime;
-				player_fuel -= 10.0f * fElapsedTime;
+				playerAngle += 1.5f * fElapsedTime;
+				playerFuel -= 10.0f * fElapsedTime;
 			}
 		}
 
@@ -252,30 +257,30 @@ public:
 			if (scale == 1.5f)
 			{
 				scale = 0.5f;
-				adj_pos = player_pos * 0.5f; // To center everything when zoomed out
+				adjustedPos = playerPos * 0.5f; // Adjusted position used in Draw() so everything stays centered
 			}
 			else
 			{
 				scale = 1.5f;
-				adj_pos = player_pos * -0.5f;
+				adjustedPos = playerPos * -0.5f;
 			}
 		}
 
 		for (auto& segment : deqSegments)
 		{
-			// Get segment under player
-			if (segment.leftnode.x < player_pos.x && segment.rightnode.x > player_pos.x)
+			// Get segment directly under player
+			if (segment.leftNode.x < playerPos.x && segment.rightNode.x > playerPos.x)
 			{
 				// Calculate point directly under player
-				current_seg_angle = segment.angle;
-				float diffy = segment.rightnode.y - segment.leftnode.y;
-				float diffx = segment.rightnode.x - segment.leftnode.x;
-				float mult = (player_pos.x - segment.leftnode.x) / diffx;
-				// olc::vf2d newpoint = { playerPos.x, segment.leftnode.y + diffy * mult };
+				currentSegmentAngle = segment.angle;
+				float diffY = segment.rightNode.y - segment.leftNode.y;
+				float diffX = segment.rightNode.x - segment.leftNode.x;
+				float mult = (playerPos.x - segment.leftNode.x) / diffX;
+				// olc::vf2d newpoint = { playerPos.x, segment.leftNode.y + diffy * mult };
 				// Altitude = Y distance to newpoint, + 7 as lower edge of player sprite
-				player_altitude = ((segment.leftnode.y + diffy * mult) - (player_pos.y + 7)) / 3;
+				playerAltitude = ((segment.leftNode.y + diffY * mult) - (playerPos.y + 7)) / 3;
 
-				if (player_altitude < 0.7f)
+				if (playerAltitude < 0.7f)
 				{
 					LandingHandler(segment);
 					break;
@@ -286,138 +291,90 @@ public:
 
 	void LandingHandler(sSegment& segment) 
 	{
-		pause = true; // Pause On Ground
-		int vel = normHVel + normVVel;
-
-		bool success = normHVel <= 3 &&
-					   normVVel <= 2 &&
-					   abs(segment.angle) <= 0.349f && // 20 deg
-					   !segment.visited &&
-					   abs(player_angle - segment.angle) <= 0.087f; // 5 deg
-
-		if (success)
+		paused = true; // Pause game while landed
+		int vel = normalizedHorizontalVelocity + normalizedVerticalVelocity;
+		// Successful landing
+		if (normalizedHorizontalVelocity <= 3 &&
+			normalizedVerticalVelocity <= 2 &&
+			abs(segment.angle) <= 0.349f && // 20 degrees
+			!segment.visited &&
+			abs(playerAngle - segment.angle) <= 0.087f) // 5 degrees
 		{
 			switch (vel)
 			{
 				case 0:
-					DrawString({
-						int(screen_width * 0.4f), int(screen_height * 0.25f) }, 
-						"PERFECT LANDING!");
+					DrawString({ int(screenWidth * 0.39f), int(screenHeight * 0.25f) }, "PERFECT LANDING!");
 					break;
-
 				case 1:
-					DrawString({ 
-						int(screen_width * 0.4f), int(screen_height * 0.25f) }, 
-						"Great landing!");
+					DrawString({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "Great landing!");
 					break;
-
 				case 2:
-					DrawString({ 
-						int(screen_width * 0.4f), int(screen_height * 0.25f) }, 
-						"Good landing!");
+					DrawString({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "Good landing!");
 					break;
-
 				case 3:
-					DrawString({ 
-						int(screen_width * 0.4f), int(screen_height * 0.25f) }, 
-						"You made it!");
+					DrawString({ int(screenWidth * 0.41f), int(screenHeight * 0.25f) }, "You made it!");
 					break;
-
 				case 4:
-					DrawString({ 
-						int(screen_width * 0.39f), int(screen_height * 0.25f) }, 
-						"Bit shaky there!");
+					DrawString({ int(screenWidth * 0.39f), int(screenHeight * 0.25f) }, "Bit shaky there!");
 					break;
-
 				case 5:
-					DrawString({ 
-						int(screen_width * 0.39f), int(screen_height * 0.25f) }, 
-						"Almost lost it!");
+					DrawString({ int(screenWidth * 0.39f), int(screenHeight * 0.25f) }, "Almost lost it!");
 					break;
-
 				default:
 					break;
 			}
 
-			DrawString({ 
-				int(screen_width * 0.47f), int(screen_height * 0.2f)}, 
-				"+" + std::to_string(int(50 + abs(segment.angle) * 544 * (5 - vel))));
-
-			DrawString({ 
-				int(screen_width * 0.435f), int(screen_height * 0.4f) }, 
-				"+500 fuel", 
-				olc::DARK_GREY);
-
-			DrawStringDecal({
-				screen_width * 0.33f, screen_height * 0.8f },
-				"Press SPACE to continue!");
+			DrawString(
+				{ int(screenWidth * 0.47f), int(screenHeight * 0.2f) }, 
+				"+" + std::to_string(int(50 + abs(segment.angle) * 544 * (5 - vel)))
+			);
+			DrawString( { int(screenWidth * 0.435f), int(screenHeight * 0.4f) }, "+500 fuel", olc::DARK_GREY);
+			DrawStringDecal( { screenWidth * 0.33f, screenHeight * 0.8f }, "Press SPACE to continue!");
 			
-			// Unpause on space
+			// Unpause game when pressing space
 			if (GetKey(olc::Key::SPACE).bPressed)
 			{
-				// Launch based on ground angle
-				// Add score 50-1000 based on ground angle, velocity
-				player_vel		 = { -cos(player_angle + PI2) * 60.0f, -sin(player_angle + PI2) * 60.0f };
-				player_score    += int(50 + abs(segment.angle) * 544 * (5 - vel)); 
-				player_fuel     += 500;
-				player_landings += 1;
-				segment.visited  = true;
-				pause            = false;
+				// Launch player based on ground angle
+				playerVel = { -cos(playerAngle + PI2) * 60.0f, -sin(playerAngle + PI2) * 60.0f };
+				playerScore += int(50 + abs(segment.angle) * 544 * (5 - vel)); 
+				playerFuel += 500;
+				playerLandings += 1;
+				segment.visited = true;
+				paused = false;
 			}
 		}	
 		else
 		{
-			player_dead = true;
+			playerDead = true;
 
 			if (vel < 7)
-			{
-				DrawString({ 
-				int(screen_width * 0.31f), int(screen_height * 0.25f) }, 
-				"You broke the landing gear!");
-			}
-			else if (vel < 10)
-			{
-				DrawString({ 
-				int(screen_width * 0.4f), int(screen_height * 0.25f) }, 
-				"You crashed it!");
-			}
-			else if (vel < 20)
-			{
-				DrawString({ 
-				int(screen_width * 0.4f), int(screen_height * 0.25f) }, 
-				"You wrecked it!");
-			}
-			else if (vel >= 20)
-			{
-				DrawString({ 
-				int(screen_width * 0.37f), int(screen_height * 0.25f) }, 
-				"YOU BLEW A CRATER!");
-			}
-			else if (abs(player_angle - segment.angle) > PI2)
-			{
-				DrawString({ 
-				int(screen_width * 0.37f), int(screen_height * 0.25f) }, 
-				"You're in the dirt!");
-			}
+				DrawString( { int(screenWidth * 0.31f), int(screenHeight * 0.25f) }, "You broke the landing gear!");
 
-			DrawStringDecal({
-				screen_width * 0.33f, screen_height * 0.8f },
-				"Press SPACE to restart!");
+			else if (vel < 10)
+				DrawString( { int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "You crashed it!");
+
+			else if (vel < 20)
+				DrawString( { int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "You wrecked it!");
+
+			else if (vel >= 20)
+				DrawString( { int(screenWidth * 0.37f), int(screenHeight * 0.25f) }, "YOU BLEW A CRATER!");
+
+			DrawStringDecal( { screenWidth * 0.33f, screenHeight * 0.8f }, "Press SPACE to restart!");
 			
-			// Reset Game
+			// Reset game
 			if (GetKey(olc::Key::SPACE).bPressed)
 			{
-				player_pos = { (float)screen_width / 2, (float)screen_height / 2 };
-				player_vel = { 0.0f, 0.0f };
-				adj_pos = { player_pos / 2 };
-				earth_pos = { RandFloat(10.0f, screen_width - 10.0f), RandFloat(10.0f, screen_height / 3) };
-				player_angle = 0.0f;
-				player_thrust = 0.0f;
-				player_score = 0.0f;
-				player_fuel = 2250;
-				player_landings = 0;
-				player_dead	= false;
-				pause = false;
+				playerPos = { (float)screenWidth / 2, (float)screenHeight / 2 };
+				playerVel = { 0.0f, 0.0f };
+				adjustedPos = { playerPos / 2 };
+				earthPos = { RandFloat(10.0f, screenWidth - 10.0f), RandFloat(10.0f, screenHeight / 3) };
+				playerAngle = 0.0f;
+				playerThrust = 0.0f;
+				playerScore = 0.0f;
+				playerFuel = 2250;
+				playerLandings = 0;
+				playerDead	= false;
+				paused = false;
 				scale = 0.5f;
 
 				deqSegments.clear();
@@ -427,52 +384,56 @@ public:
 	}
 
 	template<typename T>
-	void CreateNewSegment(T scene, bool left, olc::vf2d distx, olc::vf2d disty)
+	void CreateNewTerrainSegment(T scene, bool left, olc::vf2d distX, olc::vf2d distY)
 	{
-		// New rightnode is the previous back() segments leftnode
-		// New leftnode is random with regard to previous back() segments leftnode
+		// New rightNode is the previous back() segments leftNode
+		// New leftNode is random with regard to previous back() segments leftNode
 		if (left)
 		{
-			olc::vf2d newrightnode = scene->back().leftnode;
-			olc::vf2d newleftnode = { 
-				scene->back().leftnode.x - RandFloat(distx.x, distx.y),
-				scene->back().leftnode.y + RandFloat(disty.x, disty.y) };
+			olc::vf2d newRightNode = scene->back().leftNode;
+			olc::vf2d newLeftNode = { 
+				scene->back().leftNode.x - RandFloat(distX.x, distX.y),
+				scene->back().leftNode.y + RandFloat(distY.x, distY.y) 
+			};
 
 			scene->push_back({
-				newleftnode,
-				newrightnode,
-				GetGroundAngle(newleftnode, newrightnode),
-				false });
+				newLeftNode,
+				newRightNode,
+				GetGroundAngle(newLeftNode, newRightNode),
+				false 
+			});
 		}
 		else
 		{
-			olc::vf2d newleftnode = scene->front().rightnode;
-			olc::vf2d newrightnode = { 
-				scene->front().rightnode.x + RandFloat(distx.x, distx.y),
-				scene->front().rightnode.y + RandFloat(disty.x, disty.y) };
+			olc::vf2d newLeftNode = scene->front().rightNode;
+			olc::vf2d newRightNode = { 
+				scene->front().rightNode.x + RandFloat(distX.x, distX.y),
+				scene->front().rightNode.y + RandFloat(distY.x, distY.y) 
+			};
 
 			scene->push_front({
-				newleftnode,
-				newrightnode,
-				GetGroundAngle(newleftnode, newrightnode),
-				false });
+				newLeftNode,
+				newRightNode,
+				GetGroundAngle(newLeftNode, newRightNode),
+				false 
+			});
 		}
 	}
 
-	void Terrain() 
+	void SpawnTerrain() 
 	{
-		// Plant first node
+		// Spawn first nodes
 		if (!deqSegments.size() && !deqBgSegments.size())
 		{
 			olc::vf2d node1 = { 
-				player_pos.x - 20.0f, 
-				RandFloat(screen_height * 1.3f, screen_height * 1.6f) };
+				playerPos.x - 20.0f, 
+				RandFloat(screenHeight * 1.3f, screenHeight * 1.6f) };
 
 			olc::vf2d node2 = { 
-				player_pos.x + 20.0f, 
-				RandFloat(screen_height * 1.3f, screen_height * 1.6f) };
+				playerPos.x + 20.0f, 
+				RandFloat(screenHeight * 1.3f, screenHeight * 1.6f) };
 
-			// Actual ground
+			// Solid ground
 			deqSegments.push_back({ 
 				node1,
 				node2,
@@ -481,214 +442,228 @@ public:
 			
 			// Background
 			deqBgSegments.push_back({ 
-				{ player_pos.x - 7.0f, RandFloat(screen_height * 0.9f, screen_height * 1.0f) },
-				{ player_pos.x + 7.0f, RandFloat(screen_height * 0.9f, screen_height * 1.0f) },
+				{ playerPos.x - 7.0f, RandFloat(screenHeight * 0.9f, screenHeight * 1.0f) },
+				{ playerPos.x + 7.0f, RandFloat(screenHeight * 0.9f, screenHeight * 1.0f) },
 				0.0f,
 				false });
 		}
 		
-		// If the front() or back() segment is near the screen border, spawn new ones
-		if (deqSegments.back().rightnode.x > -250)
-			CreateNewSegment(&deqSegments, true, { 30.0f, 50.0f }, { -50.0f, 50.0f });
+		// If the front() or back() terrain segment is near the screen border, spawn new ones
+		if (deqSegments.back().rightNode.x > -250)
+			CreateNewTerrainSegment(&deqSegments, true, { 30.0f, 50.0f }, { -50.0f, 50.0f });
 
-		if (deqSegments.front().leftnode.x < screen_width + 250)
-			CreateNewSegment(&deqSegments, false, { 30.0f, 50.0f }, { -50.0f, 50.0f });
+		if (deqSegments.front().leftNode.x < screenWidth + 250)
+			CreateNewTerrainSegment(&deqSegments, false, { 30.0f, 50.0f }, { -50.0f, 50.0f });
 		
-		if (deqBgSegments.back().rightnode.x > -250)
-			CreateNewSegment(&deqBgSegments, true, { 15.0f, 25.0f }, { -15.0f, 15.0f });
+		if (deqBgSegments.back().rightNode.x > -250)
+			CreateNewTerrainSegment(&deqBgSegments, true, { 15.0f, 25.0f }, { -15.0f, 15.0f });
 		
-		if (deqBgSegments.front().leftnode.x < screen_width + 250)
-			CreateNewSegment(&deqBgSegments, false, { 15.0f, 25.0f }, { -15.0f, 15.0f });
+		if (deqBgSegments.front().leftNode.x < screenWidth + 250)
+			CreateNewTerrainSegment(&deqBgSegments, false, { 15.0f, 25.0f }, { -15.0f, 15.0f });
 	}
 
 	void Draw(float fElapsedTime)
 	{
-		static float burnertime = 0.0f;
-		static float texttime = 0.0f;
-		static float Time = 0.0f;
-		Time += fElapsedTime;
+		static float burnerTime = 0.0f;
+		static float textTime = 0.0f;
+		static float time = 0.0f;
+		time += fElapsedTime;
 
 		Clear(olc::BLACK);
 
-		DrawSprite(
-			earth_pos * scale + adj_pos, 
-			sprEarth.get(), 
-			int(scale + 1.0f));
+		DrawSprite(earthPos * scale + adjustedPos, sprEarth.get(), int(scale + 1.0f));
 
 		// Distinguish between ESC-pause and landed-pause
-		if (pause && (int)player_altitude) 
+		if (paused && (int)playerAltitude) 
 		{
-			DrawString({ int(screen_width * 0.33f), int(screen_height * 0.7f) }, "         PAUSED\n\nPress SPACE to continue!");
-			DrawString({ int(screen_width * 0.05f), int(screen_height * 0.1f) }, "Velocity", olc::DARK_GREY);
-			DrawString({ int(screen_width * 0.85f), int(screen_height * 0.1f) }, "Fuel\nLandings", olc::DARK_GREY);
-			DrawString({ int(screen_width * 0.45f), int(screen_height * 0.1f) }, "Score", olc::DARK_GREY);
-			DrawString({ int(screen_width * 0.55f), int(screen_height * 0.4f), }, "Altitude", olc::DARK_GREY);
+			DrawString({ int(screenWidth * 0.33f), int(screenHeight * 0.7f) }, "         PAUSED\n\nPress SPACE to continue!");
+			DrawString({ int(screenWidth * 0.05f), int(screenHeight * 0.1f) }, "Velocity", olc::DARK_GREY);
+			DrawString({ int(screenWidth * 0.85f), int(screenHeight * 0.1f) }, "Fuel\nLandings", olc::DARK_GREY);
+			DrawString({ int(screenWidth * 0.45f), int(screenHeight * 0.1f) }, "Score", olc::DARK_GREY);
+			DrawString({ int(screenWidth * 0.55f), int(screenHeight * 0.4f), }, "Altitude", olc::DARK_GREY);
 		}
 
 		// Background
 		for (auto& segment : deqBgSegments)
 		{
 			// Find segments on screen
-			if (segment.rightnode.x < screen_width / scale - adj_pos.x &&
-				segment.leftnode.x > -screen_width / scale + adj_pos.x)
+			if (segment.rightNode.x < screenWidth / scale - adjustedPos.x &&
+				segment.leftNode.x > -screenWidth / scale + adjustedPos.x)
 			{
 				// Fill black
 				DrawWarpedDecal(
 					decSurface.get(),
-					{ segment.leftnode * scale + adj_pos,
-					segment.rightnode * scale + adj_pos,
-					olc::vf2d(segment.rightnode.x, segment.rightnode.y + 100.0f) * scale + adj_pos,
-					olc::vf2d(segment.leftnode.x, segment.leftnode.y + 100.0f) * scale + adj_pos },
-					olc::VERY_DARK_GREY);
+					{ 
+						segment.leftNode * scale + adjustedPos,
+						segment.rightNode * scale + adjustedPos,
+						olc::vf2d(segment.rightNode.x, segment.rightNode.y + 100.0f) * scale + adjustedPos,
+						olc::vf2d(segment.leftNode.x, segment.leftNode.y + 100.0f) * scale + adjustedPos 
+					},
+					olc::VERY_DARK_GREY
+				);
 			}
 		}
 
-		// TODO: CONVERT TO VECTOR OF PAIRS
-		if (!player_dead)
+		if (!playerDead)
 		{
 			DrawRotatedDecal(
-				player_pos * scale + adj_pos,
+				playerPos * scale + adjustedPos,
 				decPlayer.get(),
-				player_angle,
+				playerAngle,
 				olc::vf2d(8.0f, 8.0f),
-				olc::vf2d(1.0f, 1.0f) * scale);
+				olc::vf2d(1.0f, 1.0f) * scale
+			);
 		}
 		else
 		{
 			// Different levels of damage decals
-			if (normHVel + normVVel < 7)
+			if (normalizedHorizontalVelocity + normalizedVerticalVelocity < 7)
 			{
 				DrawRotatedDecal(
-					player_pos * scale + adj_pos,
+					playerPos * scale + adjustedPos,
 					decPlayerLightDamage.get(),
-					current_seg_angle,
+					currentSegmentAngle,
 					olc::vf2d(8.0f, 8.0f),
-					olc::vf2d(1.0f, 1.0f) * scale);
+					olc::vf2d(1.0f, 1.0f) * scale
+				);
 			}
-			else if (normHVel + normVVel < 10)
+			else if (normalizedHorizontalVelocity + normalizedVerticalVelocity < 10)
 			{
 				DrawRotatedDecal(
-					player_pos * scale + adj_pos,
+					playerPos * scale + adjustedPos,
 					decPlayerMediumDamage.get(),
-					current_seg_angle,
+					currentSegmentAngle,
 					olc::vf2d(8.0f, 8.0f),
-					olc::vf2d(1.0f, 1.0f) * scale);
+					olc::vf2d(1.0f, 1.0f) * scale
+				);
 			}
-			else if (normHVel + normVVel < 13)
+			else if (normalizedHorizontalVelocity + normalizedVerticalVelocity < 13)
 			{
 				DrawRotatedDecal(
-					player_pos * scale + adj_pos,
+					playerPos * scale + adjustedPos,
 					decPlayerHeavyDamage.get(),
-					current_seg_angle,
+					currentSegmentAngle,
 					olc::vf2d(8.0f, 8.0f),
-					olc::vf2d(1.0f, 1.0f) * scale);
+					olc::vf2d(1.0f, 1.0f) * scale
+				);
 			}
-			else if (normHVel + normVVel > 12)
+			else if (normalizedHorizontalVelocity + normalizedVerticalVelocity > 12)
 			{
 				DrawRotatedDecal(
-					player_pos * scale + adj_pos,
+					playerPos * scale + adjustedPos,
 					decPlayerDestroyed.get(),
-					current_seg_angle,
+					currentSegmentAngle,
 					olc::vf2d(8.0f, 8.0f),
-					olc::vf2d(1.0f, 1.0f) * scale);
+					olc::vf2d(1.0f, 1.0f) * scale
+				);
 			}
 		}
 		
-		if ((int)player_fuel && !pause)
+		if ((int)playerFuel && !paused)
 		{
 			if (GetKey(olc::Key::W).bHeld)
 			{
-				burnertime += fElapsedTime;
-				if (burnertime > 1.0f) 
-					burnertime = 1.0f;
-
+				burnerTime += fElapsedTime;
+				if (burnerTime > 1.0f) 
+					burnerTime = 1.0f;
 				// Using sin() and time here for burner growth effect
 				DrawRotatedDecal(
-					player_pos * scale + adj_pos,
+					playerPos * scale + adjustedPos,
 					decBurnerEnd.get(),
-					player_angle,
+					playerAngle,
 					{ 8.0f, -8.0f },
-					olc::vf2d( 0.8f + abs(sin(burnertime)) * 0.5f, 0.8f + abs(sin(burnertime)) * 0.5f ) * scale);
+					olc::vf2d( 0.8f + abs(sin(burnerTime)) * 0.5f, 0.8f + abs(sin(burnerTime)) * 0.5f ) * scale
+				);
 			}
 			else
 			{
 				// Short burnoff decal, can't use bReleased because it only draws for one frame
-				if (burnertime > 0.0f)
+				if (burnerTime > 0.0f)
 					DrawRotatedDecal(
-						player_pos * scale + adj_pos,
+						playerPos * scale + adjustedPos,
 						decEnd.get(),
-						player_angle,
+						playerAngle,
 						olc::vf2d( 8.0f, -5.0f ),
-						olc::vf2d( 2.0f + abs(sin(burnertime) * 3.0f), 1.5f) * scale);
+						olc::vf2d( 2.0f + abs(sin(burnerTime) * 3.0f), 1.5f) * scale
+					);
 
-				burnertime -= fElapsedTime * 10;
+				burnerTime -= fElapsedTime * 10;
 
-				if (burnertime < 0.0f) 
-					burnertime = 0.0f;
+				if (burnerTime < 0.0f) 
+					burnerTime = 0.0f;
 			}
 			// Smaller side thrusters
 			if (GetKey(olc::Key::A).bHeld)
 			{
-				DrawRotatedDecal(player_pos * scale + adj_pos,
-								 decBurnerEnd.get(),
-								 player_angle + 0.5f * PI,
-								 olc::vf2d(-25.0f, -15.0f),
-								 olc::vf2d(0.2f, 0.5f) * scale);
+				DrawRotatedDecal(
+					playerPos * scale + adjustedPos,
+					decBurnerEnd.get(),
+					playerAngle + 0.5f * PI,
+					olc::vf2d(-25.0f, -15.0f),
+					olc::vf2d(0.2f, 0.5f) * scale
+				);
 			}
 			if (GetKey(olc::Key::D).bHeld)
 			{
-				DrawRotatedDecal(player_pos * scale + adj_pos,
-								 decBurnerEnd.get(),
-								 player_angle - 0.5f * PI,
-								 olc::vf2d(41.0f, -15.0f),
-								 olc::vf2d(0.2f, 0.5f) * scale);
+				DrawRotatedDecal(
+					playerPos * scale + adjustedPos,
+					decBurnerEnd.get(),
+					playerAngle - 0.5f * PI,
+					olc::vf2d(41.0f, -15.0f),
+					olc::vf2d(0.2f, 0.5f) * scale
+				);
 			}
 		}
-		
-		// Terrain
+		// Foreground
 		for (auto& segment : deqSegments)
 		{
-			if (segment.rightnode.x < screen_width / scale - adj_pos.x &&
-				segment.leftnode.x > -screen_width / scale + adj_pos.x)
+			if (segment.rightNode.x < screenWidth / scale - adjustedPos.x &&
+				segment.leftNode.x > -screenWidth / scale + adjustedPos.x)
 			{
-				// Distinguish landable segments
+				// Landable segments are WHITE, highlighted
 				if (abs(segment.angle) <= 0.349f && !segment.visited)
 				{
 					DrawWarpedDecal(
 						decSurface.get(),
-						{ segment.leftnode * scale + adj_pos,
-						segment.rightnode * scale + adj_pos,
-						olc::vf2d(segment.rightnode.x, segment.rightnode.y + 500.0f) * scale + adj_pos,
-						olc::vf2d(segment.leftnode.x, segment.leftnode.y + 500.0f) * scale + adj_pos },
-						olc::WHITE);
+						{ 
+							segment.leftNode * scale + adjustedPos,
+							segment.rightNode * scale + adjustedPos,
+							olc::vf2d(segment.rightNode.x, segment.rightNode.y + 500.0f) * scale + adjustedPos,
+							olc::vf2d(segment.leftNode.x, segment.leftNode.y + 500.0f) * scale + adjustedPos 
+						},
+						olc::WHITE
+					);
 				}
+				// Non-landable segments are DARK_GREY
 				else
 				{
 					DrawWarpedDecal(
 						decSurface.get(),
-						{ segment.leftnode * scale + adj_pos,
-						segment.rightnode * scale + adj_pos,
-						olc::vf2d(segment.rightnode.x, segment.rightnode.y + 500.0f) * scale + adj_pos,
-						olc::vf2d(segment.leftnode.x, segment.leftnode.y + 500.0f) * scale + adj_pos },
-						olc::DARK_GREY);
+						{ 
+							segment.leftNode * scale + adjustedPos,
+							segment.rightNode * scale + adjustedPos,
+							olc::vf2d(segment.rightNode.x, segment.rightNode.y + 500.0f) * scale + adjustedPos,
+							olc::vf2d(segment.leftNode.x, segment.leftNode.y + 500.0f) * scale + adjustedPos 
+						},
+						olc::DARK_GREY
+					);
 				}
 			}
 		}
-
 		// UI
-		if (texttime < 3.0f)
+		if (textTime < 3.0f)
 		{
-			DrawString({ int(screen_width * 0.27f), int(screen_height * 0.25f)}, "Land on the highlighted segments!");
-			texttime += fElapsedTime;
+			DrawString({ int(screenWidth * 0.27f), int(screenHeight * 0.25f)}, "Land on the highlighted segments!");
+			textTime += fElapsedTime;
 		}
 
 		std::vector<std::pair<olc::vf2d, std::string>> ui = {
-			{ {screen_width * 0.05f, screen_height * 0.05f}, "H.V. " + std::to_string(normHVel) + "m/s" },
-			{ {screen_width * 0.05f, screen_height * 0.07f}, "V.V. " + std::to_string(normVVel) + "m/s" },
-			{ {screen_width * 0.85f, screen_height * 0.05f}, "F " + std::to_string((int)player_fuel) + "kg"},
-			{ {screen_width * 0.85f, screen_height * 0.07f}, "L " + std::to_string(player_landings) },
-			{ {screen_width * 0.47f, screen_height * 0.05f}, std::to_string((int)player_score) },
-			{ player_pos * scale + adj_pos, std::to_string((int)player_altitude) + "m" }
+			{ {screenWidth * 0.05f, screenHeight * 0.05f}, "H.V. " + std::to_string(normalizedHorizontalVelocity) + "m/s" },
+			{ {screenWidth * 0.05f, screenHeight * 0.07f}, "V.V. " + std::to_string(normalizedVerticalVelocity) + "m/s" },
+			{ {screenWidth * 0.85f, screenHeight * 0.05f}, "F " + std::to_string((int)playerFuel) + "kg"},
+			{ {screenWidth * 0.85f, screenHeight * 0.07f}, "L " + std::to_string(playerLandings) },
+			{ {screenWidth * 0.47f, screenHeight * 0.05f}, std::to_string((int)playerScore) },
+			{ playerPos * scale + adjustedPos, std::to_string((int)playerAltitude) + "m" }
 		};
 
 		for (auto& line : ui)
@@ -696,18 +671,19 @@ public:
 			if (line != ui.back())
 				DrawString(line.first, line.second, olc::GREY);
 			else
-				if(!player_dead)
+				if(!playerDead)
 					DrawRotatedStringDecal(
 						line.first,
 						line.second,
-						player_angle,
+						playerAngle,
 						{ -10.0f, 10.0f },
 						olc::GREY,
-						olc::vf2d( 1.0f, 1.0f ) * scale);
+						olc::vf2d( 1.0f, 1.0f ) * scale
+					);
 		}
 	}
 
-	void Comms(float fElapsedTime)
+	void CrewComms(float fElapsedTime)
 	{
 		const std::string command[5] = {
 			"Eagle, status?", // random questions 0 - 4
@@ -723,7 +699,7 @@ public:
 			"We could use some beer,\notherwise good!",
 			"Command, we're just fine.",
 			"Damn, nice view out here!", // random 4-6
-			"I think I can see my house...",
+			"I think I can see my\nhouse from here...",
 			"Earth is beautiful...",
 			"Carefully...", // low alt 7-9
 			"Slowly...",
@@ -734,168 +710,156 @@ public:
 			"\nWe're low on fuel!" // fuel
 		};
 
-		static bool set = false;
-		static bool messageonscreen = false;
-		static float randomtime = RandFloat(50.0f, 70.0f);
-		static float randomtime2 = randomtime / 2;
-		static float Time = 0.0f;
-		static int randomquestion;
-		static int randomresponse;
-		static int randomchatter;
-		static int randomlowalt;
-		static int randomname;
+		static float time = 0.0f;
+		static float randomTime = RandFloat(50.0f, 70.0f);
+		static bool randomVariablesSet = false;
+		static bool isMessageOnScreen = false;
+		static int randomControlQuestion;
+		static int randomCrewReponse;
+		static int randomCrewChatter;
+		static int randomLowAltWarning;
+		static int randomName;
 		
-		if (!set || player_dead)
+		if (!randomVariablesSet || playerDead)
 		{
-			randomquestion = rand() % 5;
-			randomresponse = rand() % 4;
-			randomchatter = rand() % 3 + 4;
-			randomlowalt = rand() % 3 + 7;
-			randomname = rand() % 3 + 10;
-			set = true;
+			randomControlQuestion = rand() % 5;
+			randomCrewReponse = rand() % 4;
+			randomCrewChatter = rand() % 3 + 4;
+			randomLowAltWarning = rand() % 3 + 7;
+			randomName = rand() % 3 + 10;
+			randomVariablesSet = true;
 		}
 
-		// Clock if not paused
-		if (!pause)
-			Time += fElapsedTime;
-
-		// Allow messsages in ESC-pause
-		if (player_altitude > 0.7f)
+		if (!paused)
+			time += fElapsedTime;
+		
+		// Allow messsages in ESC-pause, but not landed-pause
+		if (playerAltitude > 0.7f)
 		{
-			if (Time > randomtime)
+			if (time > randomTime)
 			{
 				// Command messages
-				if (Time < randomtime + 5.0f)
-				{
+				if (time < randomTime + 8.0f)
 					DrawStringDecal(
-						{ screen_width * 0.05f, screen_height * 0.25f },
-						"Command:\n" + command[randomquestion],
-						olc::GREY);
-				}
+						{ screenWidth * 0.05f, screenHeight * 0.25f }, 
+						"Command:\n" + command[randomControlQuestion], 
+						olc::GREY
+					);
 
 				// Crew response
-				if (Time > randomtime + 3.0f && Time < randomtime + 8.0f)
-				{
+				if (time > randomTime + 3.0f && time < randomTime + 8.0f)
 					DrawStringDecal(
-						{ screen_width * 0.05f, screen_height * 0.3f },
-						"Eagle:\n" + crew[randomresponse],
-						olc::GREY);
-				}
+						{ screenWidth * 0.05f, screenHeight * 0.3f },
+						"Eagle:\n" + crew[randomCrewReponse],
+						olc::GREY
+					);
 
 				// Reset timers when done
-				if (Time > randomtime + 8.0f)
+				if (time > randomTime + 8.0f)
 				{
-					set = false;
-					randomtime = RandFloat(50.0f, 70.0f);
-					Time = 0.0f;
+					randomVariablesSet = false;
+					randomTime = RandFloat(50.0f, 70.0f);
+					time = 0.0f;
 				}
 			}
-			static float drawtime = 0.0f;
-			static bool timeset = false;
-
-			// Crew chatter
-			if (Time > randomtime / 2 && Time < randomtime / 2 + 5.0f)
-			{
-				DrawStringDecal(
-					{ screen_width * 0.05f, screen_height * 0.35f },
-					crew[randomname] + crew[randomchatter], 
-					olc::GREY);
-			}
-
-			// Low alt
-			if (player_altitude < 4.0f && abs(current_seg_angle) <= 0.349f)
-			{
-				DrawStringDecal(
-					{ screen_width * 0.05f, screen_height * 0.4f },
-					crew[randomname] + crew[randomlowalt],
-					olc::GREY);
-			}
-			else
-				randomlowalt = rand() % 3 + 7;
 
 			// Fuel
-			if (player_fuel < 500)
-			{
+			if (playerFuel < 500)
 				DrawStringDecal(
-					{ screen_width * 0.05f, screen_height * 0.45f },
+					{ screenWidth * 0.05f, screenHeight * 0.45f },
 					crew[10] + crew[13],
-					olc::GREY);
-			}
+					olc::GREY
+				);
+
+			// Crew chatter
+			if (time > randomTime / 2 && time < randomTime / 2 + 5.0f && playerAltitude > 4.0f)
+				DrawStringDecal(
+					{ screenWidth * 0.05f, screenHeight * 0.35f },
+					crew[randomName] + crew[randomCrewChatter], 
+					olc::GREY
+				);
+
+			// Low alt
+			if (playerAltitude < 4.0f && abs(currentSegmentAngle) <= 0.349f)
+				DrawStringDecal(
+					{ screenWidth * 0.05f, screenHeight * 0.4f },
+					crew[randomName] + crew[randomLowAltWarning],
+					olc::GREY
+				);
+			else
+				randomLowAltWarning = rand() % 3 + 7;
 		}
 	}
 
-	void TitleScreen(float fElapsedTime)
+	void DrawTitleScreen(float fElapsedTime)
 	{
-		// TODO: CONVERT TO VECTOR OF PAIRS LIKE draw()
-		DrawRotatedStringDecal(
-			{ screen_width * 0.05f, screen_height * 0.05f },
-			"   CONTROLS",
-			0.0f, 
-			{ 0.0f, 0.0f }, 
-			olc::GREY);
+		// TODO: CONVERT TO VECTOR OF PAIRS LIKE Draw()
+		DrawRotatedStringDecal( { screenWidth * 0.05f, screenHeight * 0.05f }, "   CONTROLS", 0.0f, { 0.0f, 0.0f }, olc::GREY);
 
 		DrawRotatedStringDecal(
-			{ screen_width * 0.05f, screen_height * 0.07f },
-			"WASD  - movement", 
+			{ screenWidth * 0.05f, screenHeight * 0.07f },
+			"WAD   - Thrusters", 
 			0.0f, 
 			{ 0.0f, 0.0f }, 
-			olc::GREY);
+			olc::GREY
+		);
 
 		DrawRotatedStringDecal(
-			{ screen_width * 0.05f, screen_height * 0.09f },
-			"SHIFT - zoom", 
+			{ screenWidth * 0.05f, screenHeight * 0.09f },
+			"SHIFT - Zoom", 
 			0.0f, 
 			{ 0.0f, 0.0f }, 
-			olc::GREY);
+			olc::GREY
+		);
 
 		DrawRotatedStringDecal(
-			{ screen_width * 0.05f, screen_height * 0.11f },
-			"ESC   - pause",
+			{ screenWidth * 0.05f, screenHeight * 0.11f },
+			"ESC   - Pause",
 			0.0f, 
 			{ 0.0f, 0.0f },
-			olc::GREY);
+			olc::GREY
+		);
 
-		DrawString({ int(screen_width * 0.25f), int(screen_height * 0.3f) },
+		DrawString({ int(screenWidth * 0.25f), int(screenHeight * 0.3f) },
 			"LUNAR LANDER", 
 			olc::WHITE,
-			3);
+			3
+		);
 
 		DrawString(
-			{ int(screen_width * 0.35f), int(screen_height * 0.8f) },
+			{ int(screenWidth * 0.35f), int(screenHeight * 0.8f) },
 			"Press SPACE to start!", 
 			olc::GREY);
 
 		DrawRotatedDecal(
-			{ screen_width * 0.52f, screen_height * 0.55f },
+			{ screenWidth * 0.52f, screenHeight * 0.55f },
 			decPlayer.get(), 
 			0.4f, 
 			{ 8.0f, 8.0f }, 
 			{ 7.0f, 7.0f });
 
 		DrawSprite(
-			{ int(screen_width * 0.8f), int(screen_height * 0.1f) }, 
+			{ int(screenWidth * 0.8f), int(screenHeight * 0.1f) }, 
 			sprEarth.get());
 
-		if (GetKey(olc::SPACE).bPressed) title = false;
+		if (GetKey(olc::SPACE).bPressed) titleScreen = false;
 	}
 
 	bool OnUserUpdate(float fElapsedTime) override
 	{
 		if (GetKey(olc::ESCAPE).bPressed)
-			pause = true;
+			paused = true;
 
 		if (GetKey(olc::SPACE).bPressed)
-			pause = false;
+			paused = false;
 
-		if (title)
-		{
-			TitleScreen(fElapsedTime);
-		}
+		if (titleScreen)
+			DrawTitleScreen(fElapsedTime);
 		else
 		{
-			Terrain();
+			SpawnTerrain();
 			Draw(fElapsedTime);
-			Comms(fElapsedTime);
+			CrewComms(fElapsedTime);
 			Physics(fElapsedTime);
 			//debug();
 		}

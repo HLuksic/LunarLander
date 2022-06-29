@@ -13,18 +13,18 @@ Player::Player()
 	sprPlayerLightDamage	= std::make_unique<olc::Sprite>("../gfx/landerLightDamage.png");
 	sprPlayerMediumDamage	= std::make_unique<olc::Sprite>("../gfx/landerMediumDamage.png");
 	sprPlayerHeavyDamage	= std::make_unique<olc::Sprite>("../gfx/landerHeavyDamage.png");
-	sprPlayerDestroyed		= std::make_unique<olc::Sprite>("../gfx/landerDestroyed.png");
-	sprPlayer				= std::make_unique<olc::Sprite>("../gfx/lander.png");
-	sprBurner				= std::make_unique<olc::Sprite>("../gfx/burner.png");
-	sprEnd					= std::make_unique<olc::Sprite>("../gfx/end.png");
+	sprPlayerDestroyed	= std::make_unique<olc::Sprite>("../gfx/landerDestroyed.png");
+	sprPlayer	= std::make_unique<olc::Sprite>("../gfx/lander.png");
+	sprBurner	= std::make_unique<olc::Sprite>("../gfx/burner.png");
+	sprEnd	= std::make_unique<olc::Sprite>("../gfx/end.png");
 
 	decPlayerLightDamage	= std::make_unique<olc::Decal>(sprPlayerLightDamage.get());
 	decPlayerMediumDamage	= std::make_unique<olc::Decal>(sprPlayerMediumDamage.get());
 	decPlayerHeavyDamage	= std::make_unique<olc::Decal>(sprPlayerHeavyDamage.get());
-	decPlayerDestroyed		= std::make_unique<olc::Decal>(sprPlayerDestroyed.get());
-	decPlayer				= std::make_unique<olc::Decal>(sprPlayer.get());
-	decBurner				= std::make_unique<olc::Decal>(sprBurner.get());
-	decEnd					= std::make_unique<olc::Decal>(sprEnd.get());
+	decPlayerDestroyed	= std::make_unique<olc::Decal>(sprPlayerDestroyed.get());
+	decPlayer	= std::make_unique<olc::Decal>(sprPlayer.get());
+	decBurner	= std::make_unique<olc::Decal>(sprBurner.get());
+	decEnd	= std::make_unique<olc::Decal>(sprEnd.get());
 
 	Reset();
 }
@@ -34,53 +34,46 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 	static float burnerTime = 0.0f;
 
 	if (!playerDead)
-	{
 		pge->DrawRotatedDecal(
 			playerPos * scale + adjustedPos,
 			decPlayer.get(),
 			playerAngle,
 			olc::vf2d(8.0f, 8.0f),
 			olc::vf2d(1.0f, 1.0f) * scale);
-	}
 	else
 	{
 		// Different levels of damage decals
 		if (normalizedHorizontalVelocity + normalizedVerticalVelocity < 7)
-		{
 			pge->DrawRotatedDecal(
 				playerPos * scale + adjustedPos,
 				decPlayerLightDamage.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
 				olc::vf2d(1.0f, 1.0f) * scale);
-		}
+
 		else if (normalizedHorizontalVelocity + normalizedVerticalVelocity < 10)
-		{
 			pge->DrawRotatedDecal(
 				playerPos * scale + adjustedPos,
 				decPlayerMediumDamage.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
 				olc::vf2d(1.0f, 1.0f) * scale);
-		}
+
 		else if (normalizedHorizontalVelocity + normalizedVerticalVelocity < 13)
-		{
 			pge->DrawRotatedDecal(
 				playerPos * scale + adjustedPos,
 				decPlayerHeavyDamage.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
 				olc::vf2d(1.0f, 1.0f) * scale);
-		}
+		
 		else if (normalizedHorizontalVelocity + normalizedVerticalVelocity > 12)
-		{
 			pge->DrawRotatedDecal(
 				playerPos * scale + adjustedPos,
 				decPlayerDestroyed.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
 				olc::vf2d(1.0f, 1.0f) * scale);
-		}
 	}
 
 	if ((int)playerFuel && !paused)
@@ -116,23 +109,20 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 		}
 		// Smaller side thrusters
 		if (pge->GetKey(olc::Key::A).bHeld)
-		{
 			pge->DrawRotatedDecal(
 				playerPos * scale + adjustedPos,
 				decBurner.get(),
 				playerAngle + 0.5f * PI,
 				olc::vf2d(-25.0f, -15.0f),
 				olc::vf2d(0.2f, 0.5f) * scale);
-		}
+
 		if (pge->GetKey(olc::Key::D).bHeld)
-		{
 			pge->DrawRotatedDecal(
 				playerPos * scale + adjustedPos,
 				decBurner.get(),
 				playerAngle - 0.5f * PI,
 				olc::vf2d(41.0f, -15.0f),
 				olc::vf2d(0.2f, 0.5f) * scale);
-		}
 	}
 }
 
@@ -263,12 +253,12 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* terrain, float fElapsed
 
 void Player::Reset()
 {
-	playerAngle = 0.0f;
-	playerPos = { (float)screenWidth / 2, (float)screenHeight / 2 };
-	playerVel = { 0.0f, 0.7f };
-	playerThrust = 0.0f;
-	playerScore = 0;
-	playerFuel = 2250;
-	playerLandings = 0;
-	playerDead = false;
+	playerAngle	= 0.0f;
+	playerPos	= { (float)screenWidth / 2, (float)screenHeight / 2 };
+	playerVel	= { 0.0f, 0.7f };
+	playerThrust	= 0.0f;
+	playerScore	= 0;
+	playerFuel	= 2250;
+	playerLandings	= 0;
+	playerDead	= false;
 }

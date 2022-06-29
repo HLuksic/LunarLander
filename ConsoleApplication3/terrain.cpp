@@ -119,8 +119,6 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* player)
 		// Find segments on screen
 		if (segment.rightNode.x < screenWidth / scale - player->adjustedPos.x &&
 			segment.leftNode.x > -screenWidth / scale + player->adjustedPos.x)
-		{
-			// Fill black
 			pge->DrawWarpedDecal(
 				decSurface.get(),
 				{ 
@@ -130,7 +128,6 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* player)
 					olc::vf2d(segment.leftNode.x, segment.leftNode.y + 100.0f) * scale + player->adjustedPos 
 				},
 				olc::VERY_DARK_GREY);
-		}
 	}
 
 	// Foreground
@@ -139,9 +136,8 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* player)
 		if (segment.rightNode.x < screenWidth / scale - player->adjustedPos.x &&
 			segment.leftNode.x > -screenWidth / scale + player->adjustedPos.x)
 		{
-			// Landable segments are WHITE, highlighted
+			// Landable segments are WHITE, non-landable are DARK_GREY
 			if (abs(segment.angle) <= 0.349f && !segment.visited)
-			{
 				pge->DrawWarpedDecal(
 					decSurface.get(),
 					{
@@ -151,10 +147,7 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* player)
 						olc::vf2d(segment.leftNode.x, segment.leftNode.y + 500.0f) * scale + player->adjustedPos
 					},
 					olc::WHITE);
-			}
-			// Non-landable segments are DARK_GREY
 			else
-			{
 				pge->DrawWarpedDecal(
 					decSurface.get(),
 					{
@@ -164,7 +157,6 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* player)
 						olc::vf2d(segment.leftNode.x, segment.leftNode.y + 500.0f) * scale + player->adjustedPos
 					},
 					olc::DARK_GREY);
-			}
 		}
 	}
 }

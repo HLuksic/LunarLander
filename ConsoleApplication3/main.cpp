@@ -33,13 +33,13 @@ public:
 	bool OnUserCreate() override
 	{
 		srand((unsigned int)time(0));
-		player			= new Player;
-		terrain			= new Terrain;
+		player	= new Player;
+		terrain	= new Terrain;
 		userInterface	= new Interface;
-		background		= new Background;
-		paused			= false;
-		titleScreen		= true;
-		scale			= 0.5f;
+		background	= new Background;
+		paused	= false;
+		titleScreen	= true;
+		scale	= 0.5f;
 
 		return true;
 	}

@@ -6,8 +6,8 @@ class Player;
 
 struct sStar 
 {
-	olc::vf2d	position;
-	float		lightIntensity;
+	olc::vf2d position;
+	float lightIntensity;
 };
 
 class Background

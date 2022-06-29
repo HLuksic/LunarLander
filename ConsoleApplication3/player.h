@@ -12,9 +12,9 @@ public:
 	Player();
 
 public:
-	int		playerLandings;
-	int		normalizedHorizontalVelocity;
-	int		normalizedVerticalVelocity;
+	int	playerLandings;
+	int	normalizedHorizontalVelocity;
+	int	normalizedVerticalVelocity;
 	float	playerAngle;
 	float	playerAltitude;
 	float	playerThrust;

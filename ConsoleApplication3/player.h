@@ -1,7 +1,6 @@
 #pragma once
 
 #include "olcPixelGameEngine.h"
-
 #include "terrain.h"
 #include "background.h"
 

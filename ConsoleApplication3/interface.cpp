@@ -1,5 +1,4 @@
 #include "olcPixelGameEngine.h"
-
 #include "interface.h"
 #include "global.h"
 #include "terrain.h"

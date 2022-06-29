@@ -1,6 +1,8 @@
+#include "olcPixelGameEngine.h"
 
 #include "background.h"
 #include "global.h"
+#include "player.h"
 
 Background::Background()
 {
@@ -8,27 +10,27 @@ Background::Background()
 	Reset();
 }
 
-void Background::Draw(olc::PixelGameEngine* pge)
+void Background::Draw(olc::PixelGameEngine* pge, Player* player)
 {
-	pge->DrawSprite(earthPos * scale + adjustedPos, sprEarth.get(), int(scale + 1.0f));
+	pge->DrawSprite(earthPos * scale + player->adjustedPos, sprEarth.get(), int(scale + 1.0f));
 
 	for (auto& star : vecStars)
 	{
 		if (star.lightIntensity < 0.25)
 		{
-			pge->DrawCircle(star.position * scale + adjustedPos, 1 * scale, olc::VERY_DARK_GREY);
+			pge->DrawCircle(star.position * scale + player->adjustedPos, 1 * scale, olc::VERY_DARK_GREY);
 		}
 		else if (star.lightIntensity < 0.5)
 		{
-			pge->DrawCircle(star.position * scale + adjustedPos, 1 * scale, olc::DARK_GREY);
+			pge->DrawCircle(star.position * scale + player->adjustedPos, 1 * scale, olc::DARK_GREY);
 		}
 		if (star.lightIntensity < 0.75)
 		{
-			pge->DrawCircle(star.position * scale + adjustedPos, 1 * scale, olc::GREY);
+			pge->DrawCircle(star.position * scale + player->adjustedPos, 1 * scale, olc::GREY);
 		}
 		else
 		{
-			pge->DrawCircle(star.position * scale + adjustedPos, 1 * scale, olc::WHITE);
+			pge->DrawCircle(star.position * scale + player->adjustedPos, 1 * scale, olc::WHITE);
 		}
 	}
 }
@@ -40,7 +42,7 @@ void Background::Reset()
 	for (int i = 0; i < 50; i++)
 	{
 		sStar star;
-		star.position = olc::vf2d(RandFloat(-225.0f, 775.0f), RandFloat(-98.0f, 293.0f));
+		star.position = olc::vf2d(RandFloat(-250.0f, 800.0f), RandFloat(-110.0f, 305.0f));
 		star.lightIntensity = RandFloat(0.0f, 1.0f);
 
 		vecStars.push_back(star);

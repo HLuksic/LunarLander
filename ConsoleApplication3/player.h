@@ -1,6 +1,11 @@
 #pragma once
 
+#include "olcPixelGameEngine.h"
+
 #include "terrain.h"
+#include "background.h"
+
+class Interface;
 
 class Player
 {
@@ -8,42 +13,47 @@ public:
 	Player();
 
 public:
-	static int		playerLandings;
-	static int		normalizedHorizontalVelocity;
-	static int		normalizedVerticalVelocity;
-	static float	playerAngle;
-	static float	playerAltitude;
-	static float	playerThrust;
-	static float	playerScore;
-	static float	playerFuel;
-	static float	currentSegmentAngle;
-	static bool		playerDead;
+	int		playerLandings;
+	int		normalizedHorizontalVelocity;
+	int		normalizedVerticalVelocity;
+	float	playerAngle;
+	float	playerAltitude;
+	float	playerThrust;
+	float	playerScore;
+	float	playerFuel;
+	float	currentSegmentAngle;
+	bool	playerDead;
+	
+	olc::vf2d playerPos;
+	olc::vf2d adjustedPos;
+	olc::vf2d playerVel;
 
-	static olc::vf2d playerVel;
-
-private:
-	static std::unique_ptr<olc::Sprite> sprPlayer;
-	static std::unique_ptr<olc::Sprite> sprPlayerLightDamage;
-	static std::unique_ptr<olc::Sprite> sprPlayerMediumDamage;
-	static std::unique_ptr<olc::Sprite> sprPlayerHeavyDamage;
-	static std::unique_ptr<olc::Sprite> sprPlayerDestroyed;
-	static std::unique_ptr<olc::Sprite> sprBurner;
-	static std::unique_ptr<olc::Sprite> sprEnd;
-
-public:
-	static std::unique_ptr<olc::Decal> decPlayer;
+	std::unique_ptr<olc::Decal> decPlayer;
 
 private:
-	static std::unique_ptr<olc::Decal> decPlayerLightDamage;
-	static std::unique_ptr<olc::Decal> decPlayerMediumDamage;
-	static std::unique_ptr<olc::Decal> decPlayerHeavyDamage;
-	static std::unique_ptr<olc::Decal> decPlayerDestroyed;
-	static std::unique_ptr<olc::Decal> decBurner;
-	static std::unique_ptr<olc::Decal> decEnd;
+	std::unique_ptr<olc::Sprite> sprPlayer;
+	std::unique_ptr<olc::Sprite> sprPlayerLightDamage;
+	std::unique_ptr<olc::Sprite> sprPlayerMediumDamage;
+	std::unique_ptr<olc::Sprite> sprPlayerHeavyDamage;
+	std::unique_ptr<olc::Sprite> sprPlayerDestroyed;
+	std::unique_ptr<olc::Sprite> sprBurner;
+	std::unique_ptr<olc::Sprite> sprEnd;
+
+	std::unique_ptr<olc::Decal> decPlayerLightDamage;
+	std::unique_ptr<olc::Decal> decPlayerMediumDamage;
+	std::unique_ptr<olc::Decal> decPlayerHeavyDamage;
+	std::unique_ptr<olc::Decal> decPlayerDestroyed;
+	std::unique_ptr<olc::Decal> decBurner;
+	std::unique_ptr<olc::Decal> decEnd;
 
 public:
+	void Collision(
+		olc::PixelGameEngine* pge,
+		sSegment& segment, 
+		Background* background, 
+		Terrain* terrain, 
+		Interface* userInterface);
 	void Draw(olc::PixelGameEngine* pge, float fElapsedTime);
-	void Collision(olc::PixelGameEngine* pge, sSegment& segment);
-	void Physics(olc::PixelGameEngine* pge, float fElapsedTime);
-	static void Reset();
+	void Physics(olc::PixelGameEngine* pge, Terrain* terrain, float fElapsedTime);
+	void Reset();
 };

@@ -4,9 +4,13 @@
 #include "global.h"
 #include "terrain.h"
 #include "background.h"
+#include "interface.h"
 
 Player::Player()
 {
+	playerPos = { playerX, playerY };
+	adjustedPos = playerPos / 2;
+
 	sprPlayerLightDamage	= std::make_unique<olc::Sprite>("../gfx/landerLightDamage.png");
 	sprPlayerMediumDamage	= std::make_unique<olc::Sprite>("../gfx/landerMediumDamage.png");
 	sprPlayerHeavyDamage	= std::make_unique<olc::Sprite>("../gfx/landerHeavyDamage.png");
@@ -37,8 +41,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 			decPlayer.get(),
 			playerAngle,
 			olc::vf2d(8.0f, 8.0f),
-			olc::vf2d(1.0f, 1.0f) * scale
-		);
+			olc::vf2d(1.0f, 1.0f) * scale);
 	}
 	else
 	{
@@ -50,8 +53,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 				decPlayerLightDamage.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
-				olc::vf2d(1.0f, 1.0f) * scale
-			);
+				olc::vf2d(1.0f, 1.0f) * scale);
 		}
 		else if (normalizedHorizontalVelocity + normalizedVerticalVelocity < 10)
 		{
@@ -60,8 +62,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 				decPlayerMediumDamage.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
-				olc::vf2d(1.0f, 1.0f) * scale
-			);
+				olc::vf2d(1.0f, 1.0f) * scale);
 		}
 		else if (normalizedHorizontalVelocity + normalizedVerticalVelocity < 13)
 		{
@@ -70,8 +71,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 				decPlayerHeavyDamage.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
-				olc::vf2d(1.0f, 1.0f) * scale
-			);
+				olc::vf2d(1.0f, 1.0f) * scale);
 		}
 		else if (normalizedHorizontalVelocity + normalizedVerticalVelocity > 12)
 		{
@@ -80,8 +80,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 				decPlayerDestroyed.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
-				olc::vf2d(1.0f, 1.0f) * scale
-			);
+				olc::vf2d(1.0f, 1.0f) * scale);
 		}
 	}
 
@@ -98,8 +97,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 				decBurner.get(),
 				playerAngle,
 				{ 8.0f, -8.0f },
-				olc::vf2d(0.8f + abs(sin(burnerTime)) * 0.5f, 0.8f + abs(sin(burnerTime)) * 0.5f) * scale
-			);
+				olc::vf2d(0.8f + abs(sin(burnerTime)) * 0.5f, 0.8f + abs(sin(burnerTime)) * 0.5f) * scale);
 		}
 		else
 		{
@@ -110,8 +108,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 					decEnd.get(),
 					playerAngle,
 					olc::vf2d(8.0f, -5.0f),
-					olc::vf2d(2.0f + abs(sin(burnerTime) * 3.0f), 1.5f) * scale
-				);
+					olc::vf2d(2.0f + abs(sin(burnerTime) * 3.0f), 1.5f) * scale);
 
 			burnerTime -= fElapsedTime * 10;
 
@@ -126,8 +123,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 				decBurner.get(),
 				playerAngle + 0.5f * PI,
 				olc::vf2d(-25.0f, -15.0f),
-				olc::vf2d(0.2f, 0.5f) * scale
-			);
+				olc::vf2d(0.2f, 0.5f) * scale);
 		}
 		if (pge->GetKey(olc::Key::D).bHeld)
 		{
@@ -136,66 +132,30 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 				decBurner.get(),
 				playerAngle - 0.5f * PI,
 				olc::vf2d(41.0f, -15.0f),
-				olc::vf2d(0.2f, 0.5f) * scale
-			);
+				olc::vf2d(0.2f, 0.5f) * scale);
 		}
 	}
 }
 
-void Player::Collision(olc::PixelGameEngine* pge, sSegment& segment)
+void Player::Collision(
+	olc::PixelGameEngine* pge, 
+	sSegment& segment, 
+	Background* background,
+	Terrain* terrain,
+	Interface* userInterface)
 {
 	paused = true; // Pause game while landed
 	int vel = normalizedHorizontalVelocity + normalizedVerticalVelocity;
+	
 	// Successful landing
-	if (normalizedHorizontalVelocity <= 3 &&
-		normalizedVerticalVelocity <= 2 &&
-		abs(segment.angle) <= 0.349f && // 20 degrees
-		!segment.visited &&
-		abs(playerAngle - segment.angle) <= 0.087f) // 5 degrees
+	if (normalizedHorizontalVelocity <= 3	&&
+		normalizedVerticalVelocity <= 2		&&
+		abs(segment.angle) <= 0.349f		&&		// 20 degrees
+		!segment.visited					&&
+		abs(playerAngle - segment.angle) <= 0.087f)	// 5 degrees
 	{
-		switch (vel)
-		{
-		case 0:
-			pge->DrawString({ int(screenWidth * 0.39f), int(screenHeight * 0.25f) }, "PERFECT LANDING!");
-			break;
-		case 1:
-			pge->DrawString({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "Great landing!");
-			break;
-		case 2:
-			pge->DrawString({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "Good landing!");
-			break;
-		case 3:
-			pge->DrawString({ int(screenWidth * 0.41f), int(screenHeight * 0.25f) }, "You made it!");
-			break;
-		case 4:
-			pge->DrawString({ int(screenWidth * 0.39f), int(screenHeight * 0.25f) }, "Bit shaky there!");
-			break;
-		case 5:
-			pge->DrawString({ int(screenWidth * 0.39f), int(screenHeight * 0.25f) }, "Almost lost it!");
-			break;
-		default:
-			break;
-		}
+		userInterface->LandingMessages(pge, segment, vel);
 
-		pge->DrawString
-		(
-			{ int(screenWidth * 0.47f), int(screenHeight * 0.2f) },
-			"+" + std::to_string(int(50 + abs(segment.angle) * 544 * (5 - vel)))
-		);
-		
-		pge->DrawString
-		(
-			{ int(screenWidth * 0.435f), int(screenHeight * 0.4f) }, 
-			"+500 fuel", 
-			olc::DARK_GREY
-		);
-		pge->DrawStringDecal
-		(
-			{ screenWidth * 0.33f, screenHeight * 0.8f }, 
-			"Press SPACE to continue!"
-		);
-
-		// Unpause game when pressing space
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
 		{
 			// Launch player based on ground angle
@@ -211,31 +171,20 @@ void Player::Collision(olc::PixelGameEngine* pge, sSegment& segment)
 	{
 		playerDead = true;
 
-		if (vel < 7)
-			pge->DrawString({ int(screenWidth * 0.31f), int(screenHeight * 0.25f) }, "You broke the landing gear!");
+		userInterface->DeathMessages(pge, vel);
 
-		else if (vel < 10)
-			pge->DrawString({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "You crashed it!");
-
-		else if (vel < 20)
-			pge->DrawString({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "You wrecked it!");
-
-		else if (vel >= 20)
-			pge->DrawString({ int(screenWidth * 0.37f), int(screenHeight * 0.25f) }, "YOU BLEW A CRATER!");
-
-		pge->DrawStringDecal({ screenWidth * 0.33f, screenHeight * 0.8f }, "Press SPACE to restart!");
-
-		// Reset game
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
 		{
 			this->Reset();
-			Terrain::Reset();
-			Background::Reset();
+			background->Reset();
+			terrain->Reset();
+
+			paused = false;
 		}
 	}
 }
 
-void Player::Physics(olc::PixelGameEngine* pge, float fElapsedTime)
+void Player::Physics(olc::PixelGameEngine* pge, Terrain* terrain, float fElapsedTime)
 {
 	static float Time = 0.0f;
 
@@ -249,11 +198,9 @@ void Player::Physics(olc::PixelGameEngine* pge, float fElapsedTime)
 		if (abs(playerAngle) > 6.283f) playerAngle = 0.0f;
 
 		// Directional velocity
-		playerVel += 
-		{
+		playerVel += {
 			playerThrust* cos(playerAngle + PI * 0.5f)* fElapsedTime,
-			playerThrust* sin(playerAngle + PI * 0.5f)* fElapsedTime
-		};
+			playerThrust* sin(playerAngle + PI * 0.5f)* fElapsedTime };
 
 		// Gravity
 		playerVel.y += 15.0f * fElapsedTime;
@@ -262,14 +209,14 @@ void Player::Physics(olc::PixelGameEngine* pge, float fElapsedTime)
 		playerScore += fElapsedTime;
 
 		// Player is stationary, terrain moves inversely
-		for (auto& segment : Terrain::deqSegments)
+		for (auto& segment : terrain->deqSegments)
 		{
 			segment.leftNode += playerVel * -1.0f * fElapsedTime;
 			segment.rightNode += playerVel * -1.0f * fElapsedTime;
 		}
 
 		// Background moves slower than foreground
-		for (auto& segment : Terrain::deqBgSegments)
+		for (auto& segment : terrain->deqBgSegments)
 		{
 			segment.leftNode += playerVel * -0.3f * fElapsedTime;
 			segment.rightNode += playerVel * -0.3f * fElapsedTime;
@@ -304,34 +251,13 @@ void Player::Physics(olc::PixelGameEngine* pge, float fElapsedTime)
 		if (scale == 1.5f)
 		{
 			scale = 0.5f;
-			adjustedPos = playerPos * 0.5f; // Adjusted position used in Draw() so everything stays centered
+			// Adjusted position used in Draw() so everything stays centered
+			adjustedPos = playerPos * 0.5f; 
 		}
 		else
 		{
 			scale = 1.5f;
 			adjustedPos = playerPos * -0.5f;
-		}
-	}
-
-	for (auto& segment : Terrain::deqSegments)
-	{
-		// Get segment directly under player
-		if (segment.leftNode.x < playerPos.x && segment.rightNode.x > playerPos.x)
-		{
-			// Calculate point directly under player
-			currentSegmentAngle = segment.angle;
-			float diffY = segment.rightNode.y - segment.leftNode.y;
-			float diffX = segment.rightNode.x - segment.leftNode.x;
-			float mult = (playerPos.x - segment.leftNode.x) / diffX;
-			// olc::vf2d newpoint = { playerPos.x, segment.leftNode.y + diffy * mult };
-			// Altitude = Y distance to newpoint, + 7 as lower edge of player sprite
-			playerAltitude = ((segment.leftNode.y + diffY * mult) - (playerPos.y + 7)) / 3;
-
-			if (playerAltitude < 0.7f)
-			{
-				Collision(pge, segment);
-				break;
-			}
 		}
 	}
 }

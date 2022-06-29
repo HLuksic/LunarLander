@@ -14,13 +14,12 @@
 #include "global.h"
 
 // TODO: 
-// FOREGROUND
-// BLACK DECALS FOR TERRAIN
-// STARS
+// FOREGROUND,
 // DEBRIS PARTICLES, 
 // SOUNDS,
 // HIGH SCORE, 
-// ADD DIFFICULTY (choose with numpad in title)
+// UI TEXT FIXES,
+// DRAW EARTH ON TITLE SCREEN
 
 class lunarLander : public olc::PixelGameEngine
 {
@@ -40,14 +39,13 @@ public:
 	bool OnUserCreate() override
 	{
 		srand((unsigned int)time(0));
-		paused = false;
-		titleScreen = true;
-		scale = 0.5f;
-
-		player = new Player;
-		terrain = new Terrain;
-		userInterface = new Interface;
-		background = new Background;
+		player			= new Player;
+		terrain			= new Terrain;
+		userInterface	= new Interface;
+		background		= new Background;
+		paused			= false;
+		titleScreen		= true;
+		scale			= 0.5f;
 
 		return true;
 	}
@@ -102,13 +100,6 @@ public:
 	}
 	#endif
 
-	void Draw(float fElapsedTime)
-	{
-		static float time = 0.0f;
-		time += fElapsedTime;
-
-	}
-
 	bool OnUserUpdate(float fElapsedTime) override
 	{
 		Clear(olc::BLACK);
@@ -120,14 +111,17 @@ public:
 			paused = false;
 
 		if (titleScreen)
-			userInterface->TitleScreen(this);
+			userInterface->TitleScreen(this, player);
 		else
 		{
+			background->Draw(this, player);
+			terrain->Spawn(player);
+			terrain->Collision(this, player, background, userInterface);
+			terrain->Draw(this, player);
+			player->Physics(this, terrain, fElapsedTime);
 			player->Draw(this, fElapsedTime);
-			terrain->Draw(this);
-			background->Draw(this);
-			userInterface->Draw(this, fElapsedTime);
-
+			userInterface->Draw(this, player, fElapsedTime);
+			
 			#ifdef DEBUG
 			Debug();
 			#endif

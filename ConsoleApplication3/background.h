@@ -2,6 +2,8 @@
 
 #include "olcPixelGameEngine.h"
 
+class Player;
+
 struct sStar 
 {
 	olc::vf2d	position;
@@ -14,11 +16,11 @@ public:
 	Background();
 
 private:
-	olc::vf2d						earthPos;
-	std::unique_ptr<olc::Sprite>	sprEarth;
-	std::vector<sStar>				vecStars;
+	olc::vf2d earthPos;
+	std::vector<sStar> vecStars;
+	std::unique_ptr<olc::Sprite> sprEarth;
 
 public:
-	void Draw(olc::PixelGameEngine* pge);
-	static void Reset();
+	void Draw(olc::PixelGameEngine* pge, Player* player);
+	void Reset();
 };

@@ -1,7 +1,9 @@
 #pragma once
 
 #include<string>
-#include "olcPixelGameEngine.h"
+#include "player.h"
+
+struct sSegment;
 
 class Interface
 {
@@ -34,6 +36,8 @@ private:
 	};
 
 public:
-	void Draw(olc::PixelGameEngine* pge, float fElapsedTime);
-	void TitleScreen(olc::PixelGameEngine* pge);
+	void Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTime);
+	void TitleScreen(olc::PixelGameEngine* pge, Player* player);
+	void LandingMessages(olc::PixelGameEngine* pge, sSegment& segment, int vel);
+	void DeathMessages(olc::PixelGameEngine* pge, int vel);
 };

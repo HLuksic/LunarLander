@@ -1,5 +1,5 @@
 ﻿#define OLC_PGE_APPLICATION
-#define DEBUG
+//#define DEBUG
 
 #include <iostream>
 #include <random>
@@ -82,35 +82,21 @@ private:
 		float life;
 	};
 
+	struct sStar {
+		olc::vf2d position;
+		float lightIntensity;
+	};
+
 	std::deque<sSegment> deqSegments;
 	std::deque<sSegment> deqBgSegments;
 	std::deque<sSegment> deqFgSegments;
 	std::vector<sSegment> vecParticles;
+	std::vector<sStar> vecStars;
 
 public:
 	bool OnUserCreate() override
 	{
-		srand((unsigned int)time(0));
-
-		screenHeight = ScreenHeight();
-		screenWidth = ScreenWidth();
-
-		// Player
-		playerAngle = 0.0f;
-		playerPos = { (float)screenWidth / 2, (float)screenHeight / 2 };
-		playerVel = { 0.0f, 0.7f };
-		playerThrust = 0.0f;
-		playerScore = 0;
-		playerFuel = 2250;
-		playerLandings = 0;
-		playerDead = false;
-		paused = false;
-		titleScreen = true;
-
-		// Environment
-		adjustedPos = playerPos / 2;
-		scale = 0.5f;
-		earthPos = { RandFloat(100.0f, 400.0f), RandFloat(100.0f, 150.0f) };
+		GameReset();
 
 		// Sprites
 		sprPlayerLightDamage = std::make_unique<olc::Sprite>("../gfx/landerLightDamage.png");
@@ -196,6 +182,43 @@ public:
 	}
 	#endif
 	
+	void GameReset() 
+	{
+		srand((unsigned int)time(0));
+
+		screenHeight = ScreenHeight();
+		screenWidth = ScreenWidth();
+
+		// Player
+		playerAngle = 0.0f;
+		playerPos = { (float)screenWidth / 2, (float)screenHeight / 2 };
+		playerVel = { 0.0f, 0.7f };
+		playerThrust = 0.0f;
+		playerScore = 0;
+		playerFuel = 2250;
+		playerLandings = 0;
+		playerDead = false;
+		paused = false;
+		titleScreen = true;
+
+		// Environment
+		adjustedPos = playerPos / 2;
+		scale = 0.5f;
+		earthPos = { RandFloat(100.0f, 400.0f), RandFloat(100.0f, 150.0f) };
+
+		deqSegments.clear();
+		deqBgSegments.clear();
+
+		for (int i = 0; i < 50; i++)
+		{
+			sStar star;
+			star.position = olc::vf2d(RandFloat(-225.0f, 775.0f), RandFloat(-98.0f, 293.0f));
+			star.lightIntensity = RandFloat(0.0f, 1.0f);
+
+			vecStars.push_back(star);
+		}
+	}
+
 	void Physics(float fElapsedTime) 
 	{ 
 		static float Time = 0.0f;
@@ -371,21 +394,7 @@ public:
 			// Reset game
 			if (GetKey(olc::Key::SPACE).bPressed)
 			{
-				playerPos = { (float)screenWidth / 2, (float)screenHeight / 2 };
-				playerVel = { 0.0f, 0.0f };
-				adjustedPos = { playerPos / 2 };
-				earthPos = { RandFloat(100.0f, 400.0f), RandFloat(100.0f, 150.0f) };
-				playerAngle = 0.0f;
-				playerThrust = 0.0f;
-				playerScore = 0.0f;
-				playerFuel = 2250;
-				playerLandings = 0;
-				playerDead	= false;
-				paused = false;
-				scale = 0.5f;
-
-				deqSegments.clear();
-				deqBgSegments.clear();
+				GameReset();
 			}
 		}
 	}
@@ -488,6 +497,27 @@ public:
 			DrawString({ int(screenWidth * 0.85f), int(screenHeight * 0.1f) }, "Fuel\nLandings", olc::DARK_GREY);
 			DrawString({ int(screenWidth * 0.45f), int(screenHeight * 0.1f) }, "Score", olc::DARK_GREY);
 			DrawString({ int(screenWidth * 0.55f), int(screenHeight * 0.4f), }, "Altitude", olc::DARK_GREY);
+		}
+
+		// Stars
+		for (auto& star : vecStars)
+		{
+			if (star.lightIntensity < 0.25)
+			{
+				DrawCircle(star.position * scale + adjustedPos, 1 * scale, olc::VERY_DARK_GREY);
+			}
+			else if (star.lightIntensity < 0.5)
+			{
+				DrawCircle(star.position * scale + adjustedPos, 1 * scale, olc::DARK_GREY);
+			}
+			if (star.lightIntensity < 0.75)
+			{
+				DrawCircle(star.position * scale + adjustedPos, 1 * scale, olc::GREY);
+			}
+			else
+			{
+				DrawCircle(star.position * scale + adjustedPos, 1 * scale, olc::WHITE);
+			}
 		}
 
 		// Background
@@ -881,7 +911,7 @@ int main() {
 
 	lunarLander game;
 	
-	if (game.Construct(550, 400, 2, 2/*300, 240, 3, 3*/))
+	if (game.Construct(550, 390, 2, 2/*300, 240, 3, 3*/))
 		game.Start();
 
 	return 0;

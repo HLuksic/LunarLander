@@ -5,6 +5,7 @@
 #include "background.h"
 
 class Interface;
+class FileHandler;
 
 class Player
 {
@@ -12,20 +13,20 @@ public:
 	Player();
 
 public:
-	int	playerLandings;
+	int	landings;
 	int	normalizedHorizontalVelocity;
 	int	normalizedVerticalVelocity;
-	float	playerAngle;
-	float	playerAltitude;
-	float	playerThrust;
-	float	playerScore;
-	float	playerFuel;
+	float	angle;
+	float	altitude;
+	float	thrust;
+	float	score;
+	float	fuel;
 	float	currentSegmentAngle;
-	bool	playerDead;
+	bool	dead;
 	
-	olc::vf2d playerPos;
-	olc::vf2d adjustedPos;
-	olc::vf2d playerVel;
+	olc::vf2d position;
+	olc::vf2d adjustedPosition;
+	olc::vf2d velocity;
 
 	std::unique_ptr<olc::Decal> decPlayer;
 
@@ -46,12 +47,13 @@ private:
 	std::unique_ptr<olc::Decal> decEnd;
 
 public:
-	void Collision(
+	void LandingHandler(
 		olc::PixelGameEngine* pge,
 		sSegment& segment, 
 		Background* background, 
 		Terrain* terrain, 
-		Interface* userInterface);
+		Interface* userInterface,
+		FileHandler* fileHandler);
 	void Draw(olc::PixelGameEngine* pge, float fElapsedTime);
 	void Physics(olc::PixelGameEngine* pge, Terrain* terrain, float fElapsedTime);
 	void Reset();

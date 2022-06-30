@@ -6,6 +6,7 @@
 class Player;
 class Interface;
 class Background;
+class FileHandler;
 
 struct sSegment 
 {
@@ -34,7 +35,7 @@ private:
 
 public:
 	void Spawn(Player* player);
-	void Collision(olc::PixelGameEngine* pge, Player* player, Background* background, Interface* userInterface);
+	void Collision(olc::PixelGameEngine* pge, Player* player, Background* background, Interface* userInterface, FileHandler* fileHandler);
 	void Draw(olc::PixelGameEngine* pge, Player* player);
 	void Reset();
 	float GetGroundAngle(olc::vf2d node1, olc::vf2d node2);

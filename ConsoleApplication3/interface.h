@@ -4,6 +4,8 @@
 #include "player.h"
 
 struct sSegment;
+class Background;
+class FileHandler;
 
 class Interface
 {
@@ -37,7 +39,7 @@ private:
 
 public:
 	void Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTime);
-	void TitleScreen(olc::PixelGameEngine* pge, Player* player);
+	void TitleScreen(olc::PixelGameEngine* pge, Background* background, Player* player, FileHandler* fileHandler);
 	void LandingMessages(olc::PixelGameEngine* pge, sSegment& segment, int vel);
-	void DeathMessages(olc::PixelGameEngine* pge, int vel);
+	void DeathMessages(olc::PixelGameEngine* pge, FileHandler* fileHandler, int velocity, int currentScore);
 };

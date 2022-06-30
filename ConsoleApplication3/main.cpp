@@ -1,10 +1,10 @@
 ﻿#include <random>
-
 #include "olcPixelGameEngine.h"
 #include "background.h"
 #include "interface.h"
 #include "player.h"
 #include "terrain.h"
+#include "filehandler.h"
 #include "global.h"
 
 // TODO: 
@@ -13,7 +13,6 @@
 // SOUNDS,
 // HIGH SCORE, 
 // UI TEXT FIXES,
-// DRAW EARTH ON TITLE SCREEN
 
 class lunarLander : public olc::PixelGameEngine
 {
@@ -28,6 +27,7 @@ private:
 	Terrain* terrain;
 	Interface* userInterface;
 	Background* background;
+	FileHandler* fileHandler;
 
 public:
 	bool OnUserCreate() override
@@ -37,6 +37,7 @@ public:
 		terrain	= new Terrain;
 		userInterface	= new Interface;
 		background	= new Background;
+		fileHandler = new FileHandler;
 		paused	= false;
 		titleScreen	= true;
 		scale	= 0.5f;
@@ -55,12 +56,12 @@ public:
 			paused = false;
 
 		if (titleScreen)
-			userInterface->TitleScreen(this, player);
+			userInterface->TitleScreen(this, background, player, fileHandler);
 		else
 		{
 			background->Draw(this, player);
 			terrain->Spawn(player);
-			terrain->Collision(this, player, background, userInterface);
+			terrain->Collision(this, player, background, userInterface, fileHandler);
 			terrain->Draw(this, player);
 			player->Physics(this, terrain, fElapsedTime);
 			player->Draw(this, fElapsedTime);

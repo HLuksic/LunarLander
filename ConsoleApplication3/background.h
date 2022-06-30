@@ -15,10 +15,12 @@ class Background
 public:
 	Background();
 
+public:
+	std::unique_ptr<olc::Sprite> sprEarth;
+	
 private:
 	olc::vf2d earthPos;
 	std::vector<sStar> vecStars;
-	std::unique_ptr<olc::Sprite> sprEarth;
 
 public:
 	void Draw(olc::PixelGameEngine* pge, Player* player);

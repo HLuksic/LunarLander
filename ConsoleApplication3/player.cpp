@@ -7,8 +7,8 @@
 
 Player::Player()
 {
-	playerPos = { playerX, playerY };
-	adjustedPos = playerPos / 2;
+	position = { playerX, playerY };
+	adjustedPosition = position / 2;
 
 	sprPlayerLightDamage	= std::make_unique<olc::Sprite>("../gfx/landerLightDamage.png");
 	sprPlayerMediumDamage	= std::make_unique<olc::Sprite>("../gfx/landerMediumDamage.png");
@@ -33,11 +33,11 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 {
 	static float burnerTime = 0.0f;
 
-	if (!playerDead)
+	if (!dead)
 		pge->DrawRotatedDecal(
-			playerPos * scale + adjustedPos,
+			position * scale + adjustedPosition,
 			decPlayer.get(),
-			playerAngle,
+			angle,
 			olc::vf2d(8.0f, 8.0f),
 			olc::vf2d(1.0f, 1.0f) * scale);
 	else
@@ -45,7 +45,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 		// Different levels of damage decals
 		if (normalizedHorizontalVelocity + normalizedVerticalVelocity < 7)
 			pge->DrawRotatedDecal(
-				playerPos * scale + adjustedPos,
+				position * scale + adjustedPosition,
 				decPlayerLightDamage.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
@@ -53,7 +53,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 
 		else if (normalizedHorizontalVelocity + normalizedVerticalVelocity < 10)
 			pge->DrawRotatedDecal(
-				playerPos * scale + adjustedPos,
+				position * scale + adjustedPosition,
 				decPlayerMediumDamage.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
@@ -61,7 +61,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 
 		else if (normalizedHorizontalVelocity + normalizedVerticalVelocity < 13)
 			pge->DrawRotatedDecal(
-				playerPos * scale + adjustedPos,
+				position * scale + adjustedPosition,
 				decPlayerHeavyDamage.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
@@ -69,14 +69,14 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 		
 		else if (normalizedHorizontalVelocity + normalizedVerticalVelocity > 12)
 			pge->DrawRotatedDecal(
-				playerPos * scale + adjustedPos,
+				position * scale + adjustedPosition,
 				decPlayerDestroyed.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
 				olc::vf2d(1.0f, 1.0f) * scale);
 	}
 
-	if ((int)playerFuel && !paused)
+	if ((int)fuel && !paused)
 	{
 		if (pge->GetKey(olc::Key::W).bHeld)
 		{
@@ -85,9 +85,9 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 				burnerTime = 1.0f;
 			// Using sin() and time here for burner growth effect
 			pge->DrawRotatedDecal(
-				playerPos * scale + adjustedPos,
+				position * scale + adjustedPosition,
 				decBurner.get(),
-				playerAngle,
+				angle,
 				{ 8.0f, -8.0f },
 				olc::vf2d(0.8f + abs(sin(burnerTime)) * 0.5f, 0.8f + abs(sin(burnerTime)) * 0.5f) * scale);
 		}
@@ -96,9 +96,9 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 			// Short burnoff decal, can't use bReleased because it only draws for one frame
 			if (burnerTime > 0.0f)
 				pge->DrawRotatedDecal(
-					playerPos * scale + adjustedPos,
+					position * scale + adjustedPosition,
 					decEnd.get(),
-					playerAngle,
+					angle,
 					olc::vf2d(8.0f, -5.0f),
 					olc::vf2d(2.0f + abs(sin(burnerTime) * 3.0f), 1.5f) * scale);
 
@@ -110,57 +110,58 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 		// Smaller side thrusters
 		if (pge->GetKey(olc::Key::A).bHeld)
 			pge->DrawRotatedDecal(
-				playerPos * scale + adjustedPos,
+				position * scale + adjustedPosition,
 				decBurner.get(),
-				playerAngle + 0.5f * PI,
+				angle + 0.5f * PI,
 				olc::vf2d(-25.0f, -15.0f),
 				olc::vf2d(0.2f, 0.5f) * scale);
 
 		if (pge->GetKey(olc::Key::D).bHeld)
 			pge->DrawRotatedDecal(
-				playerPos * scale + adjustedPos,
+				position * scale + adjustedPosition,
 				decBurner.get(),
-				playerAngle - 0.5f * PI,
+				angle - 0.5f * PI,
 				olc::vf2d(41.0f, -15.0f),
 				olc::vf2d(0.2f, 0.5f) * scale);
 	}
 }
 
-void Player::Collision(
+void Player::LandingHandler(
 	olc::PixelGameEngine* pge, 
 	sSegment& segment, 
 	Background* background,
 	Terrain* terrain,
-	Interface* userInterface)
+	Interface* userInterface,
+	FileHandler* fileHandler)
 {
 	paused = true; // Pause game while landed
-	int vel = normalizedHorizontalVelocity + normalizedVerticalVelocity;
+	int velocity = normalizedHorizontalVelocity + normalizedVerticalVelocity;
 	
 	// Successful landing
 	if (normalizedHorizontalVelocity <= 3	&&
 		normalizedVerticalVelocity <= 2		&&
 		abs(segment.angle) <= 0.349f		&&		// 20 degrees
 		!segment.visited					&&
-		abs(playerAngle - segment.angle) <= 0.087f)	// 5 degrees
+		abs(angle - segment.angle) <= 0.087f)	// 5 degrees
 	{
-		userInterface->LandingMessages(pge, segment, vel);
+		userInterface->LandingMessages(pge, segment, velocity);
 
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
 		{
 			// Launch player based on ground angle
-			playerVel = { -cos(playerAngle + HALFPI) * 60.0f, -sin(playerAngle + HALFPI) * 60.0f };
-			playerScore += int(50 + abs(segment.angle) * 544 * (5 - vel));
-			playerFuel += 500;
-			playerLandings += 1;
+			this->velocity = { -cos(angle + HALFPI) * 60.0f, -sin(angle + HALFPI) * 60.0f };
+			score += int(50 + abs(segment.angle) * 544 * (5 - velocity));
+			fuel += 500;
+			landings += 1;
 			segment.visited = true;
 			paused = false;
 		}
 	}
 	else
 	{
-		playerDead = true;
+		dead = true;
 
-		userInterface->DeathMessages(pge, vel);
+		userInterface->DeathMessages(pge, fileHandler, velocity, int(score));
 
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
 		{
@@ -178,59 +179,59 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* terrain, float fElapsed
 	static float Time = 0.0f;
 
 	// Divide by 3 for believable velocity, this is what's displayed
-	normalizedHorizontalVelocity = abs((int)(playerVel.x / 3));
-	normalizedVerticalVelocity = abs((int)(playerVel.y / 3));
+	normalizedHorizontalVelocity = abs((int)(velocity.x / 3));
+	normalizedVerticalVelocity = abs((int)(velocity.y / 3));
 
 	if (!paused) // Disable everything if paused
 	{
 		// Angle reset if full circle
-		if (abs(playerAngle) > 6.283f) playerAngle = 0.0f;
+		if (abs(angle) > 6.283f) angle = 0.0f;
 
 		// Directional velocity
-		playerVel += {
-			playerThrust* cos(playerAngle + PI * 0.5f)* fElapsedTime,
-			playerThrust* sin(playerAngle + PI * 0.5f)* fElapsedTime };
+		velocity += {
+			thrust* cos(angle + PI * 0.5f)* fElapsedTime,
+			thrust* sin(angle + PI * 0.5f)* fElapsedTime };
 
 		// Gravity
-		playerVel.y += 15.0f * fElapsedTime;
+		velocity.y += 15.0f * fElapsedTime;
 
 		// +1 score per second, this is why score is float
-		playerScore += fElapsedTime;
+		score += fElapsedTime;
 
 		// Player is stationary, terrain moves inversely
 		for (auto& segment : terrain->deqSegments)
 		{
-			segment.leftNode += playerVel * -1.0f * fElapsedTime;
-			segment.rightNode += playerVel * -1.0f * fElapsedTime;
+			segment.leftNode += velocity * -1.0f * fElapsedTime;
+			segment.rightNode += velocity * -1.0f * fElapsedTime;
 		}
 
 		// Background moves slower than foreground
 		for (auto& segment : terrain->deqBgSegments)
 		{
-			segment.leftNode += playerVel * -0.3f * fElapsedTime;
-			segment.rightNode += playerVel * -0.3f * fElapsedTime;
+			segment.leftNode += velocity * -0.3f * fElapsedTime;
+			segment.rightNode += velocity * -0.3f * fElapsedTime;
 		}
 
-		if (pge->GetKey(olc::Key::W).bHeld && (int)playerFuel)
+		if (pge->GetKey(olc::Key::W).bHeld && (int)fuel)
 		{
-			playerThrust = -40.0f;
-			playerFuel -= 100.0f * fElapsedTime;
+			thrust = -40.0f;
+			fuel -= 100.0f * fElapsedTime;
 		}
 		else
 		{
-			playerThrust = 0.0f;
+			thrust = 0.0f;
 		}
 
-		if (pge->GetKey(olc::Key::A).bHeld && (int)playerFuel)
+		if (pge->GetKey(olc::Key::A).bHeld && (int)fuel)
 		{
-			playerAngle -= 1.5f * fElapsedTime;
-			playerFuel -= 10.0f * fElapsedTime;
+			angle -= 1.5f * fElapsedTime;
+			fuel -= 10.0f * fElapsedTime;
 		}
 
-		if (pge->GetKey(olc::Key::D).bHeld && (int)playerFuel)
+		if (pge->GetKey(olc::Key::D).bHeld && (int)fuel)
 		{
-			playerAngle += 1.5f * fElapsedTime;
-			playerFuel -= 10.0f * fElapsedTime;
+			angle += 1.5f * fElapsedTime;
+			fuel -= 10.0f * fElapsedTime;
 		}
 	}
 
@@ -241,24 +242,24 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* terrain, float fElapsed
 		{
 			scale = 0.5f;
 			// Adjusted position used in Draw() so everything stays centered
-			adjustedPos = playerPos * 0.5f; 
+			adjustedPosition = position * 0.5f; 
 		}
 		else
 		{
 			scale = 1.5f;
-			adjustedPos = playerPos * -0.5f;
+			adjustedPosition = position * -0.5f;
 		}
 	}
 }
 
 void Player::Reset()
 {
-	playerAngle	= 0.0f;
-	playerPos	= { (float)screenWidth / 2, (float)screenHeight / 2 };
-	playerVel	= { 0.0f, 0.7f };
-	playerThrust	= 0.0f;
-	playerScore	= 0;
-	playerFuel	= 2250;
-	playerLandings	= 0;
-	playerDead	= false;
+	angle	= 0.0f;
+	position	= { (float)screenWidth / 2, (float)screenHeight / 2 };
+	velocity	= { 0.0f, 0.7f };
+	thrust	= 0.0f;
+	score	= 0;
+	fuel	= 2250;
+	landings	= 0;
+	dead	= false;
 }

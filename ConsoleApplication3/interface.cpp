@@ -2,6 +2,8 @@
 #include "interface.h"
 #include "global.h"
 #include "terrain.h"
+#include "background.h"
+#include "filehandler.h"
 
 void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTime)
 {
@@ -11,7 +13,7 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 	* Main UI
 	**************/
 	// Distinguish between ESC-pause and landed-pause
-	if (paused && (int)player->playerAltitude)
+	if (paused && (int)player->altitude)
 	{
 		pge->DrawString({ int(screenWidth * 0.33f), int(screenHeight * 0.7f) }, "         PAUSED\n\nPress SPACE to continue!");
 		pge->DrawString({ int(screenWidth * 0.05f), int(screenHeight * 0.1f) }, "Velocity", olc::DARK_GREY);
@@ -29,21 +31,21 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 	std::vector<std::pair<olc::vf2d, std::string>> ui = {
 		{ {screenWidth * 0.05f, screenHeight * 0.05f}, "H.V. " + std::to_string(player->normalizedHorizontalVelocity) + "m/s" },
 		{ {screenWidth * 0.05f, screenHeight * 0.07f}, "V.V. " + std::to_string(player->normalizedVerticalVelocity) + "m/s" },
-		{ {screenWidth * 0.85f, screenHeight * 0.05f}, "F " + std::to_string((int)player->playerFuel) + "kg"},
-		{ {screenWidth * 0.85f, screenHeight * 0.07f}, "L " + std::to_string(player->playerLandings) },
-		{ {screenWidth * 0.47f, screenHeight * 0.05f}, std::to_string((int)player->playerScore) },
-		{ player->playerPos * scale + player->adjustedPos, std::to_string((int)player->playerAltitude) + "m" } };
+		{ {screenWidth * 0.85f, screenHeight * 0.05f}, "F " + std::to_string((int)player->fuel) + "kg"},
+		{ {screenWidth * 0.85f, screenHeight * 0.07f}, "L " + std::to_string(player->landings) },
+		{ {screenWidth * 0.47f, screenHeight * 0.05f}, std::to_string((int)player->score) },
+		{ player->position * scale + player->adjustedPosition, std::to_string((int)player->altitude) + "m" } };
 
 	for (auto& line : ui)
 	{
 		if (line != ui.back())
 			pge->DrawString(line.first, line.second, olc::GREY);
 		else
-			if (!player->playerDead)
+			if (!player->dead)
 				pge->DrawRotatedStringDecal(
 					line.first,
 					line.second,
-					player->playerAngle,
+					player->angle,
 					{ -10.0f, 10.0f },
 					olc::GREY,
 					olc::vf2d(1.0f, 1.0f) * scale);
@@ -62,7 +64,7 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 	static int randomLowAltWarning;
 	static int randomName;
 
-	if (!randomVariablesSet || player->playerDead)
+	if (!randomVariablesSet || player->dead)
 	{
 		randomControlQuestion = rand() % 5;
 		randomCrewReponse = rand() % 4;
@@ -76,7 +78,7 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 		time += fElapsedTime;
 
 	// Allow messsages in ESC-pause, but not landed-pause
-	if (player->playerAltitude > 0.7f)
+	if (player->altitude > 0.7f)
 	{
 		if (time > randomTime)
 		{
@@ -104,21 +106,21 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 		}
 
 		// Fuel
-		if (player->playerFuel < 500)
+		if (player->fuel < 500)
 			pge->DrawStringDecal(
 				{ screenWidth * 0.05f, screenHeight * 0.45f },
 				crew[10] + crew[13],
 				olc::GREY);
 
 		// Crew chatter
-		if (time > randomTime / 2 && time < randomTime / 2 + 7.0f && player->playerAltitude > 4.0f)
+		if (time > randomTime / 2 && time < randomTime / 2 + 7.0f && player->altitude > 4.0f)
 			pge->DrawStringDecal(
 				{ screenWidth * 0.05f, screenHeight * 0.35f },
 				crew[randomName] + crew[randomCrewChatter],
 				olc::GREY);
 
 		// Low alt
-		if (player->playerAltitude < 4.0f && abs(player->currentSegmentAngle) <= 0.349f)
+		if (player->altitude < 4.0f && abs(player->currentSegmentAngle) <= 0.349f)
 			pge->DrawStringDecal(
 				{ screenWidth * 0.05f, screenHeight * 0.4f },
 				crew[randomName] + crew[randomLowAltWarning],
@@ -128,15 +130,23 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 	}
 }
 
-void Interface::TitleScreen(olc::PixelGameEngine* pge, Player* player)
+void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* background, Player* player, FileHandler* fileHandler)
 {
+	int highScore = fileHandler->ReadOrCreateFile();
+
+	if (highScore != -1)
+	{
+		pge->DrawString({ 30, 70 }, "High score: " + std::to_string(highScore));
+	}
+
 	//TODO: CONVERT TO VECTOR OF PAIRS LIKE MAIN UI
+	pge->DrawSprite({ 430, 30 }, background->sprEarth.get(), 3U);
 
 	pge->DrawRotatedStringDecal({ screenWidth * 0.05f, screenHeight * 0.05f }, "   CONTROLS", 0.0f, { 0.0f, 0.0f }, olc::GREY);
 
 	pge->DrawRotatedStringDecal(
 		{ screenWidth * 0.05f, screenHeight * 0.07f },
-		"WAD   - Thrusters",
+		"W,A,D - Thrusters",
 		0.0f,
 		{ 0.0f, 0.0f },
 		olc::GREY);
@@ -215,18 +225,23 @@ void Interface::LandingMessages(olc::PixelGameEngine* pge, sSegment& segment, in
 		"Press SPACE to continue!");
 }
 
-void Interface::DeathMessages(olc::PixelGameEngine* pge, int vel)
+void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* fileHandler, int velocity, int currentScore)
 {
-	if (vel < 7)
+	int highScore = fileHandler->ReadOrCreateFile();
+
+	if (highScore == -1 || highScore < currentScore)
+	{
+		fileHandler->OverwriteScore(currentScore);
+		pge->DrawString({ 50, 50 }, "New high score!");
+	}
+
+	if (velocity < 7)
 		pge->DrawString({ int(screenWidth * 0.31f), int(screenHeight * 0.25f) }, "You broke the landing gear!");
-
-	else if (vel < 10)
+	else if (velocity < 12)
 		pge->DrawString({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "You crashed it!");
-
-	else if (vel < 20)
+	else if (velocity < 20)
 		pge->DrawString({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "You wrecked it!");
-
-	else if (vel >= 20)
+	else
 		pge->DrawString({ int(screenWidth * 0.37f), int(screenHeight * 0.25f) }, "YOU BLEW A CRATER!");
 
 	pge->DrawStringDecal({ screenWidth * 0.33f, screenHeight * 0.8f }, "Press SPACE to restart!");

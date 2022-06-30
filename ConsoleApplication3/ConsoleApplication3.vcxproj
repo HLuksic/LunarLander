@@ -144,6 +144,7 @@
     <ClCompile Include="global.cpp" />
     <ClCompile Include="interface.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="filehandler.cpp" />
     <ClCompile Include="olcPixelGameEngine.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="terrain.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="background.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="interface.h" />
+    <ClInclude Include="filehandler.h" />
     <ClInclude Include="olcPixelGameEngine.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="terrain.h" />

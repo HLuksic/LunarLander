@@ -15,16 +15,16 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 	// Distinguish between ESC-pause and landed-pause
 	if (paused && (int)player->altitude)
 	{
-		pge->DrawString({ int(screenWidth * 0.33f), int(screenHeight * 0.7f) }, "         PAUSED\n\nPress SPACE to continue!");
-		pge->DrawString({ int(screenWidth * 0.05f), int(screenHeight * 0.1f) }, "Velocity", olc::DARK_GREY);
-		pge->DrawString({ int(screenWidth * 0.85f), int(screenHeight * 0.1f) }, "Fuel\nLandings", olc::DARK_GREY);
-		pge->DrawString({ int(screenWidth * 0.45f), int(screenHeight * 0.1f) }, "Score", olc::DARK_GREY);
-		pge->DrawString({ int(screenWidth * 0.55f), int(screenHeight * 0.4f), }, "Altitude", olc::DARK_GREY);
+		pge->DrawStringDecal({ int(screenWidth * 0.33f), int(screenHeight * 0.7f) }, "         PAUSED\n\nPress SPACE to continue!");
+		pge->DrawStringDecal({ int(screenWidth * 0.05f), int(screenHeight * 0.1f) }, "Velocity", olc::DARK_GREY);
+		pge->DrawStringDecal({ int(screenWidth * 0.85f), int(screenHeight * 0.1f) }, "Fuel\nLandings", olc::DARK_GREY);
+		pge->DrawStringDecal({ int(screenWidth * 0.45f), int(screenHeight * 0.1f) }, "Score", olc::DARK_GREY);
+		pge->DrawStringDecal({ int(screenWidth * 0.55f), int(screenHeight * 0.4f), }, "Altitude", olc::DARK_GREY);
 	}
 
 	if (textTime < 3.0f)
 	{
-		pge->DrawString({ int(screenWidth * 0.27f), int(screenHeight * 0.25f) }, "Land on the highlighted segments!");
+		pge->DrawStringDecal({ int(screenWidth * 0.27f), int(screenHeight * 0.25f) }, "Land on the highlighted segments!");
 		textTime += fElapsedTime;
 	}
 
@@ -39,7 +39,7 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 	for (auto& line : ui)
 	{
 		if (line != ui.back())
-			pge->DrawString(line.first, line.second, olc::GREY);
+			pge->DrawStringDecal(line.first, line.second, olc::GREY);
 		else
 			if (!player->dead)
 				pge->DrawRotatedStringDecal(
@@ -190,32 +190,32 @@ void Interface::LandingMessages(olc::PixelGameEngine* pge, sSegment& segment, in
 	switch (vel)
 	{
 	case 0:
-		pge->DrawString({ int(screenWidth * 0.39f), int(screenHeight * 0.25f) }, "PERFECT LANDING!");
+		pge->DrawStringDecal({ int(screenWidth * 0.39f), int(screenHeight * 0.25f) }, "PERFECT LANDING!");
 		break;
 	case 1:
-		pge->DrawString({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "Great landing!");
+		pge->DrawStringDecal({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "Great landing!");
 		break;
 	case 2:
-		pge->DrawString({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "Good landing!");
+		pge->DrawStringDecal({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "Good landing!");
 		break;
 	case 3:
-		pge->DrawString({ int(screenWidth * 0.41f), int(screenHeight * 0.25f) }, "You made it!");
+		pge->DrawStringDecal({ int(screenWidth * 0.41f), int(screenHeight * 0.25f) }, "You made it!");
 		break;
 	case 4:
-		pge->DrawString({ int(screenWidth * 0.39f), int(screenHeight * 0.25f) }, "Bit shaky there!");
+		pge->DrawStringDecal({ int(screenWidth * 0.39f), int(screenHeight * 0.25f) }, "Bit shaky there!");
 		break;
 	case 5:
-		pge->DrawString({ int(screenWidth * 0.39f), int(screenHeight * 0.25f) }, "Almost lost it!");
+		pge->DrawStringDecal({ int(screenWidth * 0.39f), int(screenHeight * 0.25f) }, "Almost lost it!");
 		break;
 	default:
 		break;
 	}
 
-	pge->DrawString(
+	pge->DrawStringDecal(
 		{ int(screenWidth * 0.47f), int(screenHeight * 0.2f) },
 		"+" + std::to_string(int(50 + abs(segment.angle) * 544 * (5 - vel))));
 
-	pge->DrawString(
+	pge->DrawStringDecal(
 		{ int(screenWidth * 0.435f), int(screenHeight * 0.4f) },
 		"+500 fuel",
 		olc::DARK_GREY);
@@ -232,17 +232,17 @@ void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* fileHandle
 	if (highScore == -1 || highScore < currentScore)
 	{
 		fileHandler->OverwriteScore(currentScore);
-		pge->DrawString({ 50, 50 }, "New high score!");
+		pge->DrawStringDecal({ 50, 50 }, "New high score!");
 	}
 
 	if (velocity < 7)
-		pge->DrawString({ int(screenWidth * 0.31f), int(screenHeight * 0.25f) }, "You broke the landing gear!");
+		pge->DrawStringDecal({ int(screenWidth * 0.31f), int(screenHeight * 0.25f) }, "You broke the landing gear!");
 	else if (velocity < 12)
-		pge->DrawString({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "You crashed it!");
+		pge->DrawStringDecal({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "You crashed it!");
 	else if (velocity < 20)
-		pge->DrawString({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "You wrecked it!");
+		pge->DrawStringDecal({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "You wrecked it!");
 	else
-		pge->DrawString({ int(screenWidth * 0.37f), int(screenHeight * 0.25f) }, "YOU BLEW A CRATER!");
+		pge->DrawStringDecal({ int(screenWidth * 0.37f), int(screenHeight * 0.25f) }, "YOU BLEW A CRATER!");
 
 	pge->DrawStringDecal({ screenWidth * 0.33f, screenHeight * 0.8f }, "Press SPACE to restart!");
 }

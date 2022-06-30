@@ -22,11 +22,11 @@ private:
 	const std::string crew[14] = 
 	{
 		"This is Eagle, all good.", // responses 0-3
-		"We're doing good out here!",
+		"We're doing good\n out here!",
 		"We could use some beer,\notherwise good!",
 		"Command, we're just fine.",
-		"Damn, nice view out here!", // random 4-6
-		"I think I can see my\nhouse from here...",
+		"Damn, nice view\nout here!", // random 4-6
+		"I think I can\nsee my house from here...",
 		"Earth is beautiful...",
 		"Carefully...", // low alt 7-9
 		"Slowly...",

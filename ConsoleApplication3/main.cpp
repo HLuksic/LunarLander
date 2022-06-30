@@ -33,14 +33,14 @@ public:
 	bool OnUserCreate() override
 	{
 		srand((unsigned int)time(0));
-		player	= new Player;
-		terrain	= new Terrain;
+		player		= new Player;
+		terrain		= new Terrain;
 		userInterface	= new Interface;
 		background	= new Background;
-		fileHandler = new FileHandler;
-		paused	= false;
+		fileHandler	= new FileHandler;
+		paused		= false;
 		titleScreen	= true;
-		scale	= 0.5f;
+		scale		= 0.5f;
 
 		return true;
 	}
@@ -60,13 +60,23 @@ public:
 		else
 		{
 			background->Draw(this, player);
+			
 			terrain->Spawn(player);
 			terrain->Collision(this, player, background, userInterface, fileHandler);
 			terrain->Draw(this, player);
+			
 			player->Physics(this, terrain, fElapsedTime);
 			player->Draw(this, fElapsedTime);
+
 			userInterface->Draw(this, player, fElapsedTime);
 		}
+		return true;
+	}
+
+	virtual bool OnUserDestroy()
+	{
+		delete player, terrain, background, userInterface, fileHandler;
+
 		return true;
 	}
 };
@@ -75,7 +85,7 @@ int main()
 {
 	lunarLander game;
 	
-	if (game.Construct(550, 390, 2, 2/*300, 240, 3, 3*/))
+	if (game.Construct(550, 390, 2, 2, true))
 		game.Start();
 
 	return 0;

@@ -34,9 +34,14 @@ private:
 	void CreateNewSegment(T terrain, bool left, olc::vf2d distanceX, olc::vf2d distanceY);
 
 public:
+	void Collision(
+		olc::PixelGameEngine* pge, 
+		Player* player, 
+		Background* background, 
+		Interface* userInterface, 
+		FileHandler* fileHandler);
 	void Spawn(Player* player);
-	void Collision(olc::PixelGameEngine* pge, Player* player, Background* background, Interface* userInterface, FileHandler* fileHandler);
 	void Draw(olc::PixelGameEngine* pge, Player* player);
-	void Reset();
 	float GetGroundAngle(olc::vf2d node1, olc::vf2d node2);
+	void Reset();
 };

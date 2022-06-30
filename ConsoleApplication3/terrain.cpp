@@ -86,7 +86,12 @@ void Terrain::Spawn(Player* player)
 		CreateNewSegment(&deqBgSegments, false, { 15.0f, 25.0f }, { -15.0f, 15.0f });
 }
 
-void Terrain::Collision(olc::PixelGameEngine* pge, Player* player, Background* background, Interface* userInterface, FileHandler* fileHandler)
+void Terrain::Collision(
+	olc::PixelGameEngine* pge, 
+	Player* player, 
+	Background* background, 
+	Interface* userInterface, 
+	FileHandler* fileHandler)
 {
 	for (auto& segment : deqSegments)
 	{

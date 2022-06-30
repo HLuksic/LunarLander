@@ -11,7 +11,7 @@ Background::Background()
 
 void Background::Draw(olc::PixelGameEngine* pge, Player* player)
 {
-	pge->DrawSprite(earthPos * scale + player->adjustedPosition, sprEarth.get(), int(scale + 1.0f));
+	pge->DrawSprite(earthPos * scale + player->adjustedPosition, sprEarth.get(), int(scale * 2));
 
 	for (auto& star : vecStars)
 	{

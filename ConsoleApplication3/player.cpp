@@ -1,9 +1,9 @@
-#include "olcPixelGameEngine.h"
 #include "player.h"
 #include "global.h"
 #include "terrain.h"
 #include "background.h"
 #include "interface.h"
+#include "audio.h"
 
 Player::Player()
 {
@@ -168,22 +168,28 @@ void Player::LandingHandler(
 	Background* background,
 	Terrain* terrain,
 	Interface* userInterface,
-	FileHandler* fileHandler)
+	FileHandler* fileHandler,
+	Audio* audio)
 {
-	paused = true; // Pause game while landed
 	int velocity = normalizedHorizontalVelocity + normalizedVerticalVelocity;
+	
+	paused = true; // Pause game while landed
 	
 	// Successful landing
 	if (normalizedHorizontalVelocity <= 3      &&
-		normalizedVerticalVelocity   <= 2      &&
-		abs(segment.angle)           <= 0.349f &&  // 20 degrees
-		abs(angle - segment.angle)   <= 0.087f &&  // 5 degrees
-		!segment.visited)
+	    normalizedVerticalVelocity   <= 2      &&
+	    abs(segment.angle)           <= 0.349f &&  // 20 degrees
+	    abs(angle - segment.angle)   <= 0.087f &&  // 5 degrees
+	    !segment.visited)
 	{
 		userInterface->LandingMessages(pge, segment, velocity);
+		audio->PlayLandingSound(pge);
 
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
 		{
+			audio->soundPlayed = false;
+			audio->PlayLaunchSound(pge);
+
 			// Launch player based on ground angle
 			this->velocity  = { -cos(angle + HALFPI) * 90.0f, -sin(angle + HALFPI) * 90.0f };
 			score          += int(50 + abs(segment.angle) * 544 * (5 - velocity));
@@ -198,6 +204,7 @@ void Player::LandingHandler(
 		dead = true;
 
 		userInterface->DeathMessages(pge, fileHandler, velocity, int(score));
+		audio->PlayDeathSound(pge);
 
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
 		{
@@ -205,6 +212,7 @@ void Player::LandingHandler(
 			background->Reset();
 			terrain->Reset();
 
+			audio->soundPlayed = false;
 			paused = false;
 		}
 	}
@@ -237,7 +245,7 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* terrain, float fElapsed
 		if (pge->GetKey(olc::Key::W).bHeld && (int)fuel)
 		{
 			thrust = -40.0f;
-			fuel -= 100.0f * fElapsedTime; // 100 kg fuel/second
+			fuel  -= 100.0f * fElapsedTime; // 100 kg fuel/second
 		}
 		else
 			thrust = 0.0f;
@@ -245,13 +253,13 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* terrain, float fElapsed
 		if (pge->GetKey(olc::Key::A).bHeld && (int)fuel)
 		{
 			angle -= 1.5f * fElapsedTime;
-			fuel -= 10.0f * fElapsedTime;
+			fuel  -= 10.0f * fElapsedTime;
 		}
 
 		if (pge->GetKey(olc::Key::D).bHeld && (int)fuel)
 		{
 			angle += 1.5f * fElapsedTime;
-			fuel -= 10.0f * fElapsedTime;
+			fuel  -= 10.0f * fElapsedTime;
 		}
 	}
 

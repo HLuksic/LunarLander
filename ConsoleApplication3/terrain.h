@@ -7,6 +7,7 @@ class Player;
 class Interface;
 class Background;
 class FileHandler;
+class Audio;
 
 struct sSegment 
 {
@@ -37,7 +38,8 @@ public:
 		Player* player, 
 		Background* background, 
 		Interface* userInterface, 
-		FileHandler* fileHandler);
+		FileHandler* fileHandler,
+		Audio* audio);
 	void Spawn(Player* player);
 	void Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTime);
 	float GetGroundAngle(olc::vf2d node1, olc::vf2d node2);

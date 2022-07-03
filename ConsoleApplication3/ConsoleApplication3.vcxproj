@@ -145,8 +145,10 @@
     <ClCompile Include="interface.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="filehandler.cpp" />
+    <ClCompile Include="olcPGEX_Sound.cpp" />
     <ClCompile Include="olcPixelGameEngine.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="audio.cpp" />
     <ClCompile Include="terrain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -154,8 +156,10 @@
     <ClInclude Include="global.h" />
     <ClInclude Include="interface.h" />
     <ClInclude Include="filehandler.h" />
+    <ClInclude Include="olcPGEX_Sound.h" />
     <ClInclude Include="olcPixelGameEngine.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="audio.h" />
     <ClInclude Include="terrain.h" />
   </ItemGroup>
   <ItemGroup>
@@ -168,6 +172,19 @@
     <Image Include="..\gfx\landerHeavyDamage.png" />
     <Image Include="..\gfx\landerLightDamage.png" />
     <Image Include="..\gfx\landerMediumDamage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\sfx\death1.wav" />
+    <Media Include="..\sfx\death2.wav" />
+    <Media Include="..\sfx\engine.wav" />
+    <Media Include="..\sfx\explosion1.wav" />
+    <Media Include="..\sfx\explosion2.wav" />
+    <Media Include="..\sfx\explosion3.wav" />
+    <Media Include="..\sfx\landing1.wav" />
+    <Media Include="..\sfx\landing2.wav" />
+    <Media Include="..\sfx\landing3.wav" />
+    <Media Include="..\sfx\launch.wav" />
+    <Media Include="..\sfx\thruster.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

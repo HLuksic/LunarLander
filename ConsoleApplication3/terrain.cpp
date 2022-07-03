@@ -1,4 +1,3 @@
-#include "olcPixelGameEngine.h"
 #include "terrain.h"
 #include "player.h"
 #include "global.h"
@@ -89,7 +88,8 @@ void Terrain::Collision(
 	Player* player, 
 	Background* background, 
 	Interface* userInterface, 
-	FileHandler* fileHandler)
+	FileHandler* fileHandler,
+	Audio* audio)
 {
 	for (auto& segment : deqSegments)
 	{
@@ -107,7 +107,7 @@ void Terrain::Collision(
 
 			if (player->altitude < 0.7f)
 			{
-				player->LandingHandler(pge, segment, background, this, userInterface, fileHandler);
+				player->LandingHandler(pge, segment, background, this, userInterface, fileHandler, audio);
 				break;
 			}
 		}

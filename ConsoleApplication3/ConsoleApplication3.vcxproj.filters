@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\Graphics">
+      <UniqueIdentifier>{00fadcb9-b3f7-4fcc-84ae-93ddf9009165}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Sounds">
+      <UniqueIdentifier>{2269da9b-de4d-4f7c-8469-2bbb9af9ca61}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -39,6 +45,12 @@
     <ClCompile Include="filehandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="audio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="olcPGEX_Sound.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="olcPixelGameEngine.h">
@@ -62,34 +74,75 @@
     <ClInclude Include="filehandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="audio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="olcPGEX_Sound.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\gfx\burner.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Graphics</Filter>
     </Image>
     <Image Include="..\gfx\earth.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Graphics</Filter>
     </Image>
     <Image Include="..\gfx\end.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Graphics</Filter>
     </Image>
     <Image Include="..\gfx\ground.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Graphics</Filter>
     </Image>
     <Image Include="..\gfx\lander.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Graphics</Filter>
     </Image>
     <Image Include="..\gfx\landerDestroyed.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Graphics</Filter>
     </Image>
     <Image Include="..\gfx\landerHeavyDamage.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Graphics</Filter>
     </Image>
     <Image Include="..\gfx\landerLightDamage.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Graphics</Filter>
     </Image>
     <Image Include="..\gfx\landerMediumDamage.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Graphics</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\sfx\engine.wav">
+      <Filter>Resource Files\Sounds</Filter>
+    </Media>
+    <Media Include="..\sfx\thruster.wav">
+      <Filter>Resource Files\Sounds</Filter>
+    </Media>
+    <Media Include="..\sfx\launch.wav">
+      <Filter>Resource Files\Sounds</Filter>
+    </Media>
+    <Media Include="..\sfx\death1.wav">
+      <Filter>Resource Files\Sounds</Filter>
+    </Media>
+    <Media Include="..\sfx\death2.wav">
+      <Filter>Resource Files\Sounds</Filter>
+    </Media>
+    <Media Include="..\sfx\explosion1.wav">
+      <Filter>Resource Files\Sounds</Filter>
+    </Media>
+    <Media Include="..\sfx\explosion2.wav">
+      <Filter>Resource Files\Sounds</Filter>
+    </Media>
+    <Media Include="..\sfx\explosion3.wav">
+      <Filter>Resource Files\Sounds</Filter>
+    </Media>
+    <Media Include="..\sfx\landing1.wav">
+      <Filter>Resource Files\Sounds</Filter>
+    </Media>
+    <Media Include="..\sfx\landing2.wav">
+      <Filter>Resource Files\Sounds</Filter>
+    </Media>
+    <Media Include="..\sfx\landing3.wav">
+      <Filter>Resource Files\Sounds</Filter>
+    </Media>
   </ItemGroup>
 </Project>

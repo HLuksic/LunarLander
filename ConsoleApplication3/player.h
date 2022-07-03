@@ -6,6 +6,7 @@
 
 class Interface;
 class FileHandler;
+class Sounds;
 
 class Player
 {
@@ -13,9 +14,9 @@ public:
 	Player();
 
 public:
-	int	landings;
-	int	normalizedHorizontalVelocity;
-	int	normalizedVerticalVelocity;
+	int     landings;
+	int     normalizedHorizontalVelocity;
+	int     normalizedVerticalVelocity;
 	float	angle;
 	float	altitude;
 	float	thrust;
@@ -53,7 +54,8 @@ public:
 		Background* background, 
 		Terrain* terrain, 
 		Interface* userInterface,
-		FileHandler* fileHandler);
+		FileHandler* fileHandler,
+		Audio* sounds);
 	void Draw(olc::PixelGameEngine* pge, float fElapsedTime);
 	void Physics(olc::PixelGameEngine* pge, Terrain* terrain, float fElapsedTime);
 	void Reset();

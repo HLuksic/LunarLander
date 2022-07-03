@@ -11,8 +11,7 @@
 // FOREGROUND,
 // DEBRIS PARTICLES, 
 // SOUNDS,
-// HIGH SCORE, 
-// UI TEXT FIXES,
+// UI TEXT FIXES
 
 class lunarLander : public olc::PixelGameEngine
 {
@@ -33,14 +32,15 @@ public:
 	bool OnUserCreate() override
 	{
 		srand((unsigned int)time(0));
-		player		= new Player;
-		terrain		= new Terrain;
-		userInterface	= new Interface;
-		background	= new Background;
-		fileHandler	= new FileHandler;
-		paused		= false;
-		titleScreen	= true;
-		scale		= 0.5f;
+
+		player        = new Player;
+		terrain       = new Terrain;
+		userInterface = new Interface;
+		background    = new Background;
+		fileHandler   = new FileHandler;
+		paused        = false;
+		titleScreen   = true;
+		scale         = 0.5f;
 
 		return true;
 	}
@@ -63,7 +63,7 @@ public:
 			
 			terrain->Spawn(player);
 			terrain->Collision(this, player, background, userInterface, fileHandler);
-			terrain->Draw(this, player);
+			terrain->Draw(this, player, fElapsedTime);
 			
 			player->Physics(this, terrain, fElapsedTime);
 			player->Draw(this, fElapsedTime);
@@ -85,7 +85,7 @@ int main()
 {
 	lunarLander game;
 	
-	if (game.Construct(550, 390, 2, 2, true))
+	if (game.Construct(550, 390, 2, 2))
 		game.Start();
 
 	return 0;

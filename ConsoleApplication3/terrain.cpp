@@ -47,7 +47,7 @@ void Terrain::CreateNewSegment(T terrain, bool left, olc::vf2d distanceX, olc::v
 void Terrain::Spawn(Player* player)
 {
 	// Spawn first nodes
-	if (!deqSegments.size() && !deqBgSegments.size())
+	if (!deqSegments.size() && !deqBackgroundSegments.size())
 	{
 		olc::vf2d node1 = {
 			player->position.x - 20.0f,
@@ -57,33 +57,31 @@ void Terrain::Spawn(Player* player)
 			player->position.x + 20.0f,
 			RandFloat(screenHeight * 1.3f, screenHeight * 1.6f) };
 
-		// Solid ground
 		deqSegments.push_back({
 			GetGroundAngle(node1, node2),
 			false,
 			node1,
 			node2 });
 
-		// Background
-		deqBgSegments.push_back({
+		deqBackgroundSegments.push_back({
 			0.0f,
 			false,
 			{ player->position.x - 7.0f, RandFloat(screenHeight * 0.9f, screenHeight * 1.0f) },
 			{ player->position.x + 7.0f, RandFloat(screenHeight * 0.9f, screenHeight * 1.0f) } });
 	}
 
-	// If the front() or back() terrain segment is near the screen border, spawn new ones
+	// If the front or back terrain segment is near the screen border, spawn new ones
 	if (deqSegments.back().rightNode.x > -250)
 		CreateNewSegment(&deqSegments, true, { 30.0f, 50.0f }, { -50.0f, 50.0f });
 
 	if (deqSegments.front().leftNode.x < screenWidth + 250)
 		CreateNewSegment(&deqSegments, false, { 30.0f, 50.0f }, { -50.0f, 50.0f });
 
-	if (deqBgSegments.back().rightNode.x > -250)
-		CreateNewSegment(&deqBgSegments, true, { 15.0f, 25.0f }, { -15.0f, 15.0f });
+	if (deqBackgroundSegments.back().rightNode.x > -250)
+		CreateNewSegment(&deqBackgroundSegments, true, { 15.0f, 25.0f }, { -15.0f, 15.0f });
 
-	if (deqBgSegments.front().leftNode.x < screenWidth + 250)
-		CreateNewSegment(&deqBgSegments, false, { 15.0f, 25.0f }, { -15.0f, 15.0f });
+	if (deqBackgroundSegments.front().leftNode.x < screenWidth + 250)
+		CreateNewSegment(&deqBackgroundSegments, false, { 15.0f, 25.0f }, { -15.0f, 15.0f });
 }
 
 void Terrain::Collision(
@@ -104,7 +102,7 @@ void Terrain::Collision(
 			float diffX = segment.rightNode.x - segment.leftNode.x;
 			float mult = (player->position.x - segment.leftNode.x) / diffX;
 
-			// Altitude = Y distance to newpoint, + 7 for lower edge of player sprite
+			// Altitude = Y distance to the point, + 7 for lower edge of player sprite
 			player->altitude = ((segment.leftNode.y + diffY * mult) - (player->position.y + 7)) / 3;
 
 			if (player->altitude < 0.7f)
@@ -116,11 +114,17 @@ void Terrain::Collision(
 	}
 }
 
-void Terrain::Draw(olc::PixelGameEngine* pge, Player* player)
+void Terrain::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTime)
 {
-	// Background
-	for (auto& segment : deqBgSegments)
+	for (auto& segment : deqBackgroundSegments)
 	{
+		// Terrain moves inversely to player
+		if (!paused)
+		{
+			segment.leftNode += player->velocity * -0.3f * fElapsedTime;
+			segment.rightNode += player->velocity * -0.3f * fElapsedTime;
+		}
+
 		// Find segments on screen
 		if (segment.rightNode.x < screenWidth / scale - player->adjustedPosition.x &&
 			segment.leftNode.x > -screenWidth / scale + player->adjustedPosition.x)
@@ -129,15 +133,20 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* player)
 				{ 
 					segment.leftNode * scale + player->adjustedPosition,
 					segment.rightNode * scale + player->adjustedPosition,
-					olc::vf2d(segment.rightNode.x, segment.rightNode.y + 100.0f) * scale + player->adjustedPosition,
-					olc::vf2d(segment.leftNode.x, segment.leftNode.y + 100.0f) * scale + player->adjustedPosition 
+					olc::vf2d(segment.rightNode.x, segment.rightNode.y + 200.0f) * scale + player->adjustedPosition,
+					olc::vf2d(segment.leftNode.x, segment.leftNode.y + 200.0f) * scale + player->adjustedPosition 
 				},
 				olc::VERY_DARK_GREY);
 	}
 
-	// Foreground
 	for (auto& segment : deqSegments)
 	{
+		if (!paused)
+		{
+			segment.leftNode += player->velocity * -1.0f * fElapsedTime;
+			segment.rightNode += player->velocity * -1.0f * fElapsedTime;
+		}
+
 		if (segment.rightNode.x < screenWidth / scale - player->adjustedPosition.x &&
 			segment.leftNode.x > -screenWidth / scale + player->adjustedPosition.x)
 		{
@@ -169,7 +178,7 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* player)
 void Terrain::Reset()
 {
 	deqSegments.clear();
-	deqBgSegments.clear();
+	deqBackgroundSegments.clear();
 }
 
 float Terrain::GetGroundAngle(olc::vf2d node1, olc::vf2d node2)

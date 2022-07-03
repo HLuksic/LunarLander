@@ -10,9 +10,13 @@ int FileHandler::ReadOrCreateFile()
 	if (file) {
 		std::getline(file, highScore);
 		file.close();
+		file.clear();
+
 		return std::atoi(highScore.c_str());
 	}
 	file.close();
+	file.clear();
+
 	return -1;
 }
 
@@ -25,4 +29,5 @@ void FileHandler::OverwriteScore(int score)
 	file << scoreString;
 
 	file.close();
+	file.clear();
 }

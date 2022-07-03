@@ -11,41 +11,33 @@ Background::Background()
 
 void Background::Draw(olc::PixelGameEngine* pge, Player* player)
 {
-	pge->DrawSprite(earthPos * scale + player->adjustedPosition, sprEarth.get(), int(scale * 2));
-
 	for (auto& star : vecStars)
 	{
 		if (star.lightIntensity < 0.25)
-		{
 			pge->DrawCircle(star.position * scale + player->adjustedPosition, 1 * int(scale), olc::VERY_DARK_GREY);
-		}
 		else if (star.lightIntensity < 0.5)
-		{
 			pge->DrawCircle(star.position * scale + player->adjustedPosition, 1 * int(scale), olc::DARK_GREY);
-		}
-		if (star.lightIntensity < 0.75)
-		{
+		else if (star.lightIntensity < 0.75)
 			pge->DrawCircle(star.position * scale + player->adjustedPosition, 1 * int(scale), olc::GREY);
-		}
 		else
-		{
 			pge->DrawCircle(star.position * scale + player->adjustedPosition, 1 * int(scale), olc::WHITE);
-		}
 	}
+
+	pge->DrawSprite(earthPos * scale + player->adjustedPosition, sprEarth.get(), int(scale * 2));
 }
 
 void Background::Reset()
 {
 	vecStars.clear();
 
-	for (int i = 0; i < 50; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		sStar star;
-		star.position = olc::vf2d(RandFloat(-250.0f, 800.0f), RandFloat(-110.0f, 295.0f));
+		star.position = olc::vf2d(RandFloat(-250.0f, 800.0f), RandFloat(-140.0f, 295.0f));
 		star.lightIntensity = RandFloat(0.0f, 1.0f);
 
 		vecStars.push_back(star);
 	}
 
-	earthPos = { RandFloat(100.0f, 400.0f), RandFloat(100.0f, 150.0f) };
+	earthPos = { RandFloat(350.0f, 420.0f), RandFloat(100.0f, 200.0f) };
 }

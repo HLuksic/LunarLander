@@ -12,6 +12,12 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 	/**************
 	* Main UI
 	**************/
+	if (textTime < 3.0f)
+	{
+		pge->DrawStringDecal({ int(screenWidth * 0.27f), int(screenHeight * 0.25f) }, "Land on the highlighted segments!");
+		textTime += fElapsedTime;
+	}
+
 	// Distinguish between ESC-pause and landed-pause
 	if (paused && (int)player->altitude)
 	{
@@ -20,12 +26,6 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 		pge->DrawStringDecal({ int(screenWidth * 0.85f), int(screenHeight * 0.1f) }, "Fuel\nLandings", olc::DARK_GREY);
 		pge->DrawStringDecal({ int(screenWidth * 0.45f), int(screenHeight * 0.1f) }, "Score", olc::DARK_GREY);
 		pge->DrawStringDecal({ int(screenWidth * 0.55f), int(screenHeight * 0.4f), }, "Altitude", olc::DARK_GREY);
-	}
-
-	if (textTime < 3.0f)
-	{
-		pge->DrawStringDecal({ int(screenWidth * 0.27f), int(screenHeight * 0.25f) }, "Land on the highlighted segments!");
-		textTime += fElapsedTime;
 	}
 
 	std::vector<std::pair<olc::vf2d, std::string>> ui = {
@@ -105,18 +105,18 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 			}
 		}
 
-		// Fuel
-		if (player->fuel < 500)
-			pge->DrawStringDecal(
-				{ screenWidth * 0.05f, screenHeight * 0.45f },
-				crew[10] + crew[13],
-				olc::GREY);
-
 		// Crew chatter
 		if (time > randomTime / 2 && time < randomTime / 2 + 7.0f && player->altitude > 4.0f)
 			pge->DrawStringDecal(
 				{ screenWidth * 0.05f, screenHeight * 0.35f },
 				crew[randomName] + crew[randomCrewChatter],
+				olc::GREY);
+		
+		// Low fuel
+		if (player->fuel < 500)
+			pge->DrawStringDecal(
+				{ screenWidth * 0.05f, screenHeight * 0.45f },
+				crew[10] + crew[13],
 				olc::GREY);
 
 		// Low alt
@@ -216,7 +216,7 @@ void Interface::LandingMessages(olc::PixelGameEngine* pge, sSegment& segment, in
 		"+" + std::to_string(int(50 + abs(segment.angle) * 544 * (5 - vel))));
 
 	pge->DrawStringDecal(
-		{ int(screenWidth * 0.435f), int(screenHeight * 0.4f) },
+		{ int(screenWidth * 0.435f), int(screenHeight * 0.3f) },
 		"+500 fuel",
 		olc::DARK_GREY);
 
@@ -230,10 +230,10 @@ void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* fileHandle
 	int highScore = fileHandler->ReadOrCreateFile();
 
 	if (highScore == -1 || highScore < currentScore)
-	{
 		fileHandler->OverwriteScore(currentScore);
-		pge->DrawStringDecal({ 50, 50 }, "New high score!");
-	}
+
+	if (highScore == currentScore)
+		pge->DrawStringDecal({ int(screenWidth * 0.4f), int(screenHeight * 0.3f) }, "NEW HIGH SCORE!");
 
 	if (velocity < 7)
 		pge->DrawStringDecal({ int(screenWidth * 0.31f), int(screenHeight * 0.25f) }, "You broke the landing gear!");

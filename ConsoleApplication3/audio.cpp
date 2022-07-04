@@ -15,6 +15,7 @@ Audio::Audio()
 	soundSamples[8]  = olc::SOUND::LoadAudioSample("../sfx/explosion3.wav");
 	soundSamples[9]  = olc::SOUND::LoadAudioSample("../sfx/death1.wav");
 	soundSamples[10] = olc::SOUND::LoadAudioSample("../sfx/death2.wav");
+	soundSamples[11] = olc::SOUND::LoadAudioSample("../sfx/end.wav");
 	soundPlayed      = false;
 }
 
@@ -28,7 +29,10 @@ void Audio::Play(olc::PixelGameEngine* pge, Player* player)
 		olc::SOUND::PlaySample(soundSamples[1], true);
 	
 	if (pge->GetKey(olc::Key::W).bReleased)
+	{
 		olc::SOUND::StopSample(soundSamples[0]);
+		//olc::SOUND::PlaySample(soundSamples[11]);
+	}
 
 	if (pge->GetKey(olc::Key::A).bReleased || pge->GetKey(olc::Key::D).bReleased)
 		olc::SOUND::StopSample(soundSamples[1]);

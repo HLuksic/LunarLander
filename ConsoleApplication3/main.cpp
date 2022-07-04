@@ -10,7 +10,7 @@
 
 // TODO: 
 // FOREGROUND,
-// DEBRIS PARTICLES, 
+// DEBRIS PARTICLES,
 // UI TEXT FIXES
 
 class lunarLander : public olc::PixelGameEngine

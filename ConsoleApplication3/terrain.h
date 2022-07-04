@@ -11,8 +11,8 @@ class Audio;
 
 struct sSegment 
 {
-	float angle;
-	bool visited;
+	float     angle;
+	bool      visited;
 	olc::vf2d leftNode;
 	olc::vf2d rightNode;
 };
@@ -27,11 +27,8 @@ public:
 	std::deque<sSegment> deqBackgroundSegments;
 private:
 	std::unique_ptr<olc::Sprite> sprSurface;
-	std::unique_ptr<olc::Decal> decSurface;
+	std::unique_ptr<olc::Decal>  decSurface;
 
-private:
-	template<typename T>
-	void CreateNewSegment(T terrain, bool left, olc::vf2d distanceX, olc::vf2d distanceY);
 public:
 	void Collision(
 		olc::PixelGameEngine* pge, 
@@ -44,4 +41,7 @@ public:
 	void Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTime);
 	float GetGroundAngle(olc::vf2d node1, olc::vf2d node2);
 	void Reset();
+private:
+	template<typename T>
+	void CreateNewSegment(T terrain, bool left, olc::vf2d distanceX, olc::vf2d distanceY);
 };

@@ -14,23 +14,20 @@ public:
 	Player();
 
 public:
-	int     landings;
-	int     normalizedHorizontalVelocity;
-	int     normalizedVerticalVelocity;
-	float	angle;
-	float	altitude;
-	float	thrust;
-	float	score;
-	float	fuel;
-	float	currentSegmentAngle;
-	bool	dead;
-	
+	float	  angle;
+	float	  altitude;
+	float	  thrust;
+	float	  score;
+	float	  fuel;
+	float	  currentSegmentAngle;
+	bool	  dead;
+	uint16_t  landings;
+	uint16_t  normalizedHorizontalVelocity;
+	uint16_t  normalizedVerticalVelocity;
 	olc::vf2d position;
 	olc::vf2d adjustedPosition;
 	olc::vf2d velocity;
-
 	std::unique_ptr<olc::Decal> decPlayer;
-
 private:
 	std::unique_ptr<olc::Sprite> sprPlayer;
 	std::unique_ptr<olc::Sprite> sprPlayerLightDamage;
@@ -40,12 +37,12 @@ private:
 	std::unique_ptr<olc::Sprite> sprBurner;
 	std::unique_ptr<olc::Sprite> sprEnd;
 
-	std::unique_ptr<olc::Decal> decPlayerLightDamage;
-	std::unique_ptr<olc::Decal> decPlayerMediumDamage;
-	std::unique_ptr<olc::Decal> decPlayerHeavyDamage;
-	std::unique_ptr<olc::Decal> decPlayerDestroyed;
-	std::unique_ptr<olc::Decal> decBurner;
-	std::unique_ptr<olc::Decal> decEnd;
+	std::unique_ptr<olc::Decal>  decPlayerLightDamage;
+	std::unique_ptr<olc::Decal>  decPlayerMediumDamage;
+	std::unique_ptr<olc::Decal>  decPlayerHeavyDamage;
+	std::unique_ptr<olc::Decal>  decPlayerDestroyed;
+	std::unique_ptr<olc::Decal>  decBurner;
+	std::unique_ptr<olc::Decal>  decEnd;
 
 public:
 	void LandingHandler(

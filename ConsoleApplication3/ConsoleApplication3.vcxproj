@@ -176,6 +176,7 @@
   <ItemGroup>
     <Media Include="..\sfx\death1.wav" />
     <Media Include="..\sfx\death2.wav" />
+    <Media Include="..\sfx\end.wav" />
     <Media Include="..\sfx\engine.wav" />
     <Media Include="..\sfx\explosion1.wav" />
     <Media Include="..\sfx\explosion2.wav" />

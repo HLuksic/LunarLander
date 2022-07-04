@@ -11,7 +11,7 @@ public:
 	Audio();
 
 private:
-	int soundSamples[11];
+	int soundSamples[12];
 public:
 	bool soundPlayed;
 

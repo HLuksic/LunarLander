@@ -32,7 +32,7 @@ void Background::Reset()
 	for (int i = 0; i < 100; i++)
 	{
 		sStar star;
-		star.position = olc::vf2d(RandFloat(-250.0f, 800.0f), RandFloat(-140.0f, 295.0f));
+		star.position = olc::vf2d(RandFloat(-250.0f, 800.0f), RandFloat(-140.0f, 310.0f));
 		star.lightIntensity = RandFloat(0.0f, 1.0f);
 
 		vecStars.push_back(star);

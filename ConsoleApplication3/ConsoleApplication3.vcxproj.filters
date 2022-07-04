@@ -144,5 +144,8 @@
     <Media Include="..\sfx\landing3.wav">
       <Filter>Resource Files\Sounds</Filter>
     </Media>
+    <Media Include="..\sfx\end.wav">
+      <Filter>Resource Files\Sounds</Filter>
+    </Media>
   </ItemGroup>
 </Project>

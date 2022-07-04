@@ -4,13 +4,43 @@
 #include "background.h"
 #include "filehandler.h"
 
+
+Interface::Interface() :
+	command
+	{
+		"Eagle, status?", // random questions 0 - 4
+		"This is command, status?",
+		"How's it going up there?",
+		"Eagle, sitrep.",
+		"Status report, Eagle.",
+	},
+	crew
+	{
+		"This is Eagle, all good.", // responses 0-3
+		"We're doing good\nout here!",
+		"We could use some beer,\notherwise good!",
+		"Command, we're just fine.",
+		"Damn, nice view\nout here!", // random 4-6
+		"I think I can\nsee my house from here...",
+		"Earth is beautiful...",
+		"Carefully...", // low alt 7-9
+		"Slowly...",
+		"Steady...",
+		"Capt. James: ", // names 10-12
+		"John: ",
+		"Fred: ",
+		"\nWe're low on fuel!" // fuel
+	}
+{
+}
+
 void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTime)
 {
 	static float textTime = 0.0f;
 
-	/**************
-	* Main UI
-	**************/
+	/////////////////////////////////////////////////////////////
+	//                       Main UI                           //
+	/////////////////////////////////////////////////////////////
 	if (textTime < 3.0f)
 	{
 		pge->DrawStringDecal({ int(screenWidth * 0.27f), int(screenHeight * 0.25f) }, "Land on the highlighted segments!");
@@ -50,18 +80,18 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 					olc::vf2d(1.0f, 1.0f) * scale);
 	}
 
-	/**************
-	* Comms
-	**************/
-	static float time = 0.0f;
-	static float randomTime = RandFloat(50.0f, 70.0f);
-	static bool randomVariablesSet = false;
-	static bool isMessageOnScreen = false;
-	static int randomControlQuestion;
-	static int randomCrewReponse;
-	static int randomCrewChatter;
-	static int randomLowAltWarning;
-	static int randomName;
+	/////////////////////////////////////////////////////////////
+	//                        Comms                            //
+	/////////////////////////////////////////////////////////////
+	static float   time               = 0.0f;
+	static float   randomTime         = RandFloat(50.0f, 70.0f);
+	static bool    randomVariablesSet = false;
+	static bool    isMessageOnScreen  = false;
+	static uint8_t randomControlQuestion;
+	static uint8_t randomCrewReponse;
+	static uint8_t randomCrewChatter;
+	static uint8_t randomLowAltWarning;
+	static uint8_t randomName;
 
 	if (!randomVariablesSet || player->dead)
 	{
@@ -81,7 +111,7 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 	{
 		if (time > randomTime)
 		{
-			// Command messages
+			// Command message
 			if (time < randomTime + 8.0f)
 				pge->DrawStringDecal(
 					{ screenWidth * 0.05f, screenHeight * 0.25f },
@@ -134,9 +164,7 @@ void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* background, P
 	int highScore = fileHandler->ReadOrCreateFile();
 
 	if (highScore != -1)
-	{
 		pge->DrawString({ 30, 70 }, "High score: " + std::to_string(highScore));
-	}
 
 	//TODO: CONVERT TO VECTOR OF PAIRS LIKE MAIN UI
 	pge->DrawSprite({ 430, 30 }, background->sprEarth.get(), 3U);

@@ -9,33 +9,12 @@ class FileHandler;
 
 class Interface
 {
-private:
-	const std::string command[5] = 
-	{
-		"Eagle, status?", // random questions 0 - 4
-		"This is command, status?",
-		"How's it going up there?",
-		"Eagle, sitrep.",
-		"Status report, Eagle.",
-	};
+public:
+	Interface();
 
-	const std::string crew[14] = 
-	{
-		"This is Eagle, all good.", // responses 0-3
-		"We're doing good\nout here!",
-		"We could use some beer,\notherwise good!",
-		"Command, we're just fine.",
-		"Damn, nice view\nout here!", // random 4-6
-		"I think I can\nsee my house from here...",
-		"Earth is beautiful...",
-		"Carefully...", // low alt 7-9
-		"Slowly...",
-		"Steady...",
-		"Capt. James: ", // names 10-12
-		"John: ",
-		"Fred: ",
-		"\nWe're low on fuel!" // fuel
-	};
+private:
+	const std::string command[5];
+	const std::string crew[14];
 
 public:
 	void Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTime);

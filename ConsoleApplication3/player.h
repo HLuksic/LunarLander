@@ -6,7 +6,7 @@
 
 class Interface;
 class FileHandler;
-class Sounds;
+class Audio;
 
 class Player
 {
@@ -52,8 +52,8 @@ public:
 		Terrain* terrain, 
 		Interface* userInterface,
 		FileHandler* fileHandler,
-		Audio* sounds);
+		Audio* audio);
 	void Draw(olc::PixelGameEngine* pge, float fElapsedTime);
-	void Physics(olc::PixelGameEngine* pge, Terrain* terrain, float fElapsedTime);
+	void Physics(olc::PixelGameEngine* pge, Terrain* terrain, Audio* audio, float fElapsedTime);
 	void Reset();
 };

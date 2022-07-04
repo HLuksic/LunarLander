@@ -11,13 +11,11 @@ public:
 	Audio();
 
 private:
-	int soundSamples[12];
+	int soundSamples[14];
 public:
 	bool soundPlayed;
 
 public:
 	void Play(olc::PixelGameEngine* pge, Player* player);
-	void PlayLandingSound(olc::PixelGameEngine* pge);
-	void PlayDeathSound(olc::PixelGameEngine* pge);
-	void PlayLaunchSound(olc::PixelGameEngine* pge);
+	void PlaySoundSample(olc::PixelGameEngine* pge, uint8_t a, uint8_t b);
 };

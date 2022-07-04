@@ -60,7 +60,7 @@ public:
 			paused = false;
 
 		if (titleScreen)
-			userInterface->TitleScreen(this, background, player, fileHandler);
+			userInterface->TitleScreen(this, background, player, fileHandler, audio);
 		else
 		{
 			background->Draw(this, player);
@@ -69,7 +69,7 @@ public:
 			terrain->Collision(this, player, background, userInterface, fileHandler, audio);
 			terrain->Draw(this, player, fElapsedTime);
 			
-			player->Physics(this, terrain, fElapsedTime);
+			player->Physics(this, terrain, audio, fElapsedTime);
 			player->Draw(this, fElapsedTime);
 
 			userInterface->Draw(this, player, fElapsedTime);

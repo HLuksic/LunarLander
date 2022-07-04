@@ -183,12 +183,14 @@ void Player::LandingHandler(
 	    !segment.visited)
 	{
 		userInterface->LandingMessages(pge, segment, velocity);
-		audio->PlayLandingSound(pge);
+
+		audio->PlaySoundSample(pge, 3, 3);
 
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
 		{
 			audio->soundPlayed = false;
-			audio->PlayLaunchSound(pge);
+			audio->PlaySoundSample(pge, 1, 2);
+			audio->soundPlayed = false;
 
 			// Launch player based on ground angle
 			this->velocity  = { -cos(angle + HALFPI) * 90.0f, -sin(angle + HALFPI) * 90.0f };
@@ -204,21 +206,23 @@ void Player::LandingHandler(
 		dead = true;
 
 		userInterface->DeathMessages(pge, fileHandler, velocity, int(score));
-		audio->PlayDeathSound(pge);
+		audio->PlaySoundSample(pge, 2, 9);
 
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
 		{
 			this->Reset();
 			background->Reset();
 			terrain->Reset();
-
 			audio->soundPlayed = false;
+			audio->PlaySoundSample(pge, 1, 11);
+			audio->soundPlayed = false;
+
 			paused = false;
 		}
 	}
 }
 
-void Player::Physics(olc::PixelGameEngine* pge, Terrain* terrain, float fElapsedTime)
+void Player::Physics(olc::PixelGameEngine* pge, Terrain* terrain, Audio* audio, float fElapsedTime)
 {
 	static float Time = 0.0f;
 
@@ -277,6 +281,13 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* terrain, float fElapsed
 			scale = 1.5f;
 			adjustedPosition = position * -0.5f;
 		}
+	}
+
+	if (this->fuel == 500)
+	{
+		audio->soundPlayed = false;
+		audio->PlaySoundSample(pge, 1, 13);
+		audio->soundPlayed = false;
 	}
 }
 

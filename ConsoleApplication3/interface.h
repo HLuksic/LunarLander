@@ -2,6 +2,7 @@
 
 #include<string>
 #include "player.h"
+#include "audio.h"
 
 struct sSegment;
 class Background;
@@ -18,7 +19,7 @@ private:
 
 public:
 	void Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTime);
-	void TitleScreen(olc::PixelGameEngine* pge, Background* background, Player* player, FileHandler* fileHandler);
+	void TitleScreen(olc::PixelGameEngine* pge, Background* background, Player* player, FileHandler* fileHandler, Audio* audio);
 	void LandingMessages(olc::PixelGameEngine* pge, sSegment& segment, int vel);
 	void DeathMessages(olc::PixelGameEngine* pge, FileHandler* fileHandler, int velocity, int currentScore);
 };

@@ -15,10 +15,10 @@ Audio::Audio()
 	soundSamples[8]  = olc::SOUND::LoadAudioSample("../sfx/explosion3.wav");
 	soundSamples[9]  = olc::SOUND::LoadAudioSample("../sfx/death1.wav");
 	soundSamples[10] = olc::SOUND::LoadAudioSample("../sfx/death2.wav");
-	soundSamples[11] = olc::SOUND::LoadAudioSample("../sfx/end.wav");
+	soundSamples[11] = olc::SOUND::LoadAudioSample("../sfx/start.wav");
+	soundSamples[12] = olc::SOUND::LoadAudioSample("../sfx/lowFuel.wav");
 	soundPlayed      = false;
 }
-
 
 void Audio::Play(olc::PixelGameEngine* pge, Player* player)
 {
@@ -29,35 +29,17 @@ void Audio::Play(olc::PixelGameEngine* pge, Player* player)
 		olc::SOUND::PlaySample(soundSamples[1], true);
 	
 	if (pge->GetKey(olc::Key::W).bReleased)
-	{
 		olc::SOUND::StopSample(soundSamples[0]);
-		//olc::SOUND::PlaySample(soundSamples[11]);
-	}
 
 	if (pge->GetKey(olc::Key::A).bReleased || pge->GetKey(olc::Key::D).bReleased)
 		olc::SOUND::StopSample(soundSamples[1]);
 }
 
-void Audio::PlayLandingSound(olc::PixelGameEngine* pge)
+void::Audio::PlaySoundSample(olc::PixelGameEngine* pge, uint8_t a, uint8_t b)
 {
 	if (!soundPlayed)
 	{
-		olc::SOUND::PlaySample(soundSamples[rand() % 3 + 3], false);
+		olc::SOUND::PlaySample(soundSamples[rand() % a + b], false);
 		soundPlayed = true;
 	}
-}
-
-void Audio::PlayDeathSound(olc::PixelGameEngine* pge)
-{
-	if (!soundPlayed)
-	{
-		olc::SOUND::PlaySample(soundSamples[rand() % 2 + 9], false);
-		soundPlayed = true;
-	}
-}
-
-void Audio::PlayLaunchSound(olc::PixelGameEngine* pge)
-{
-	if (!soundPlayed)
-		olc::SOUND::PlaySample(soundSamples[2], false);
 }

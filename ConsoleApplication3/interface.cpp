@@ -143,10 +143,12 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 		
 		// Low fuel
 		if (player->fuel < 500)
+		{
 			pge->DrawStringDecal(
 				{ screenWidth * 0.05f, screenHeight * 0.45f },
 				crew[10] + crew[13],
 				olc::GREY);
+		}
 
 		// Low alt
 		if (player->altitude < 4.0f && abs(player->currentSegmentAngle) <= 0.349f)
@@ -159,7 +161,7 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 	}
 }
 
-void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* background, Player* player, FileHandler* fileHandler)
+void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* background, Player* player, FileHandler* fileHandler, Audio* audio)
 {
 	int highScore = fileHandler->ReadOrCreateFile();
 
@@ -209,7 +211,13 @@ void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* background, P
 		{ 8.0f, 8.0f },
 		{ 7.0f, 7.0f });
 
-	if (pge->GetKey(olc::SPACE).bPressed) titleScreen = false;
+	if (pge->GetKey(olc::SPACE).bPressed)
+	{
+		titleScreen = false;
+		audio->soundPlayed = false;
+		audio->PlaySoundSample(pge, 1, 11);
+		audio->soundPlayed = true;
+	}
 }
 
 void Interface::LandingMessages(olc::PixelGameEngine* pge, sSegment& segment, int vel)

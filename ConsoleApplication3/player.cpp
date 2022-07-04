@@ -165,11 +165,11 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 void Player::LandingHandler(
 	olc::PixelGameEngine* pge, 
 	sSegment& segment, 
-	Background* background,
-	Terrain* terrain,
-	Interface* userInterface,
-	FileHandler* fileHandler,
-	Audio* audio)
+	Background* _Background,
+	Terrain* _Terrain,
+	Interface* _Interface,
+	FileHandler* _FileHandler,
+	Audio* _Audio)
 {
 	//int velocity = normalizedHorizontalVelocity + normalizedVerticalVelocity;
 	
@@ -184,13 +184,13 @@ void Player::LandingHandler(
 	{
 		gainedScore = int(50 + abs(segment.angle) * 544 * (5 - (normalizedHorizontalVelocity + normalizedVerticalVelocity)));
 		
-		audio->PlaySoundSample(pge, 3, 3);
+		_Audio->PlaySoundSample(pge, 3, 3);
 
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
 		{
-			audio->soundPlayed = false;
-			audio->PlaySoundSample(pge, 1, 2);
-			audio->soundPlayed = false;
+			_Audio->soundPlayed = false;
+			_Audio->PlaySoundSample(pge, 1, 2);
+			_Audio->soundPlayed = false;
 
 			// Launch player based on ground angle
 			this->velocity  = { -cos(angle + HALFPI) * 90.0f, -sin(angle + HALFPI) * 90.0f };
@@ -205,25 +205,25 @@ void Player::LandingHandler(
 	{
 		dead = true;
 
-		audio->PlaySoundSample(pge, 2, 9);
+		_Audio->PlaySoundSample(pge, 2, 9);
 
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
 		{
 			this->Reset();
-			background->Reset();
-			terrain->Reset();
+			_Background->Reset();
+			_Terrain->Reset();
 			adjustedPosition = position * 0.5f;
 			scale            = 0.5f;
 			paused           = false;
 			
-			audio->soundPlayed = false;
-			audio->PlaySoundSample(pge, 1, 11);
-			audio->soundPlayed = false;
+			_Audio->soundPlayed = false;
+			_Audio->PlaySoundSample(pge, 1, 11);
+			_Audio->soundPlayed = false;
 		}
 	}
 }
 
-void Player::Physics(olc::PixelGameEngine* pge, Terrain* terrain, Audio* audio, float fElapsedTime)
+void Player::Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio, float fElapsedTime)
 {
 	static float Time = 0.0f;
 
@@ -291,8 +291,8 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* terrain, Audio* audio, 
 
 	if ((int)this->fuel < 500.0f && !lowFuelSoundPlayed)
 	{
-		audio->PlaySoundSample(pge, 1, 12);
-		audio->soundPlayed = false;
+		_Audio->PlaySoundSample(pge, 1, 12);
+		_Audio->soundPlayed = false;
 		lowFuelSoundPlayed = true;
 	}
 }

@@ -8,7 +8,7 @@
 Interface::Interface() :
 	command
 	{
-		"Eagle, status?", // random questions 0 - 4
+		"Eagle, status?",                               // random questions 0 - 4
 		"This is command, status?",
 		"How's it going up there?",
 		"Eagle, sitrep.",
@@ -16,25 +16,25 @@ Interface::Interface() :
 	},
 	crew
 	{
-		"This is Eagle, all good.", // responses 0-3
+		"This is Eagle, all good.",                     // responses 0-3
 		"We're doing good\nout here!",
 		"We could use some beer,\notherwise good!",
 		"Command, we're just fine.",
-		"Damn, nice view\nout here!", // random 4-6
+		"Damn, nice view\nout here!",                   // random 4-6
 		"I think I can\nsee my house from here...",
 		"Earth is beautiful...",
-		"Carefully...", // low alt 7-9
+		"Carefully...",                                 // low alt 7-9
 		"Slowly...",
 		"Steady...",
-		"Capt. James: ", // names 10-12
+		"Capt. James: ",                                // names 10-12
 		"John: ",
 		"Fred: ",
-		"\nWe're low on fuel!" // fuel
+		"\nWe're low on fuel!"                          // fuel
 	}
 {
 }
 
-void Interface::Draw(olc::PixelGameEngine* pge, Player* player, FileHandler* fileHandler, float fElapsedTime)
+void Interface::Draw(olc::PixelGameEngine* pge, Player* _Player, FileHandler* _FileHandler, float fElapsedTime)
 {
 	static float textTime = 0.0f;
 
@@ -48,7 +48,7 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, FileHandler* fil
 	}
 
 	// Distinguish between ESC-pause and landed-pause
-	if (paused && (int)player->altitude)
+	if (paused && (int)_Player->altitude)
 	{
 		pge->DrawStringDecal({ int(screenWidth * 0.33f), int(screenHeight * 0.7f) }, "         PAUSED\n\nPress SPACE to continue!");
 		pge->DrawStringDecal({ int(screenWidth * 0.05f), int(screenHeight * 0.1f) }, "Velocity", olc::DARK_GREY);
@@ -58,37 +58,38 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, FileHandler* fil
 	}
 
 	std::vector<std::pair<olc::vf2d, std::string>> ui = {
-		{ {screenWidth * 0.05f, screenHeight * 0.05f}, "H.V. " + std::to_string(player->normalizedHorizontalVelocity) + "m/s" },
-		{ {screenWidth * 0.05f, screenHeight * 0.07f}, "V.V. " + std::to_string(player->normalizedVerticalVelocity) + "m/s" },
-		{ {screenWidth * 0.85f, screenHeight * 0.05f}, "F " + std::to_string((int)player->fuel) + "kg"},
-		{ {screenWidth * 0.85f, screenHeight * 0.07f}, "L " + std::to_string(player->landings) },
-		{ {screenWidth * 0.47f, screenHeight * 0.05f}, std::to_string((int)player->score) },
-		{ player->position * scale + player->adjustedPosition, std::to_string((int)player->altitude) + "m" } };
+		{ {screenWidth * 0.05f, screenHeight * 0.05f}, "H.V. " + std::to_string(_Player->normalizedHorizontalVelocity) + "m/s" },
+		{ {screenWidth * 0.05f, screenHeight * 0.07f}, "V.V. " + std::to_string(_Player->normalizedVerticalVelocity) + "m/s" },
+		{ {screenWidth * 0.85f, screenHeight * 0.05f}, "F " + std::to_string((int)_Player->fuel) + "kg"},
+		{ {screenWidth * 0.85f, screenHeight * 0.07f}, "L " + std::to_string(_Player->landings) },
+		{ {screenWidth * 0.47f, screenHeight * 0.05f}, std::to_string((int)_Player->score) },
+		{ _Player->position * scale + _Player->adjustedPosition, std::to_string((int)_Player->altitude) + "m" } };
 
 	for (auto& line : ui)
 	{
 		if (line != ui.back())
 			pge->DrawStringDecal(line.first, line.second, olc::GREY);
 		else
-			if (!player->dead)
+			if (!_Player->dead)
 				pge->DrawRotatedStringDecal(
 					line.first,
 					line.second,
-					player->angle,
+					_Player->angle,
 					{ -10.0f, 10.0f },
 					olc::GREY,
 					olc::vf2d(1.0f, 1.0f) * scale);
 	}
 
-	if (paused && !player->dead && player->altitude < 0.7f)
-		LandingMessages(pge, player->normalizedHorizontalVelocity + player->normalizedVerticalVelocity, player->gainedScore);
+	if (paused && !_Player->dead && _Player->altitude < 0.7f)
+		LandingMessages(pge, _Player->normalizedHorizontalVelocity + _Player->normalizedVerticalVelocity, _Player->gainedScore);
 
-	if (paused && player->dead)
-		DeathMessages(pge, fileHandler, player->normalizedHorizontalVelocity + player->normalizedVerticalVelocity, player->score);
+	if (paused && _Player->dead)
+		DeathMessages(pge, _FileHandler, _Player->normalizedHorizontalVelocity + _Player->normalizedVerticalVelocity, _Player->score);
+
 	/////////////////////////////////////////////////////////////
 	//                        Comms                            //
 	/////////////////////////////////////////////////////////////
-	static float   _time               = 0.0f;
+	static float   _time              = 0.0f;
 	static float   randomTime         = RandFloat(50.0f, 70.0f);
 	static bool    randomVariablesSet = false;
 	static bool    isMessageOnScreen  = false;
@@ -98,21 +99,21 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, FileHandler* fil
 	static uint8_t randomLowAltWarning;
 	static uint8_t randomName;
 
-	if (!randomVariablesSet || player->dead)
+	if (!randomVariablesSet || _Player->dead)
 	{
 		randomControlQuestion = rand() % 5;
-		randomCrewReponse = rand() % 4;
-		randomCrewChatter = rand() % 3 + 4;
-		randomLowAltWarning = rand() % 3 + 7;
-		randomName = rand() % 3 + 10;
-		randomVariablesSet = true;
+		randomCrewReponse     = rand() % 4;
+		randomCrewChatter     = rand() % 3 + 4;
+		randomLowAltWarning   = rand() % 3 + 7;
+		randomName            = rand() % 3 + 10;
+		randomVariablesSet    = true;
 	}
 
 	if (!paused)
 		_time += fElapsedTime;
 
 	// Allow messsages in ESC-pause, but not landed-pause
-	if (player->altitude > 0.7f)
+	if (_Player->altitude > 0.7f)
 	{
 		if (_time > randomTime)
 		{
@@ -140,14 +141,14 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, FileHandler* fil
 		}
 
 		// Crew chatter
-		if (_time > randomTime / 2 && _time < randomTime / 2 + 7.0f && player->altitude > 4.0f)
+		if (_time > randomTime / 2 && _time < randomTime / 2 + 7.0f && _Player->altitude > 4.0f)
 			pge->DrawStringDecal(
 				{ screenWidth * 0.05f, screenHeight * 0.35f },
 				crew[randomName] + crew[randomCrewChatter],
 				olc::GREY);
 		
 		// Low fuel
-		if (player->fuel < 500)
+		if (_Player->fuel < 500)
 		{
 			pge->DrawStringDecal(
 				{ screenWidth * 0.05f, screenHeight * 0.45f },
@@ -156,7 +157,7 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, FileHandler* fil
 		}
 
 		// Low alt
-		if (player->altitude < 4.0f && abs(player->currentSegmentAngle) <= 0.349f)
+		if (_Player->altitude < 4.0f && abs(_Player->currentSegmentAngle) <= 0.349f)
 			pge->DrawStringDecal(
 				{ screenWidth * 0.05f, screenHeight * 0.4f },
 				crew[randomName] + crew[randomLowAltWarning],
@@ -166,15 +167,15 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, FileHandler* fil
 	}
 }
 
-void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* background, Player* player, FileHandler* fileHandler, Audio* audio)
+void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* _Background, Player* _Player, FileHandler* _FileHandler, Audio* _Audio)
 {
-	int highScore = fileHandler->ReadOrCreateFile();
+	int highScore = _FileHandler->ReadOrCreateFile();
 
 	if (highScore != -1)
 		pge->DrawString({ 30, 70 }, "High score: " + std::to_string(highScore));
 
 	//TODO: CONVERT TO VECTOR OF PAIRS LIKE MAIN UI
-	pge->DrawSprite({ 430, 30 }, background->sprEarth.get(), 3U);
+	pge->DrawSprite({ 430, 30 }, _Background->sprEarth.get(), 3U);
 
 	pge->DrawRotatedStringDecal({ screenWidth * 0.05f, screenHeight * 0.05f }, "   CONTROLS", 0.0f, { 0.0f, 0.0f }, olc::GREY);
 
@@ -211,7 +212,7 @@ void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* background, P
 
 	pge->DrawRotatedDecal(
 		{ screenWidth * 0.52f, screenHeight * 0.55f },
-		player->decPlayer.get(),
+		_Player->decPlayer.get(),
 		0.4f,
 		{ 8.0f, 8.0f },
 		{ 7.0f, 7.0f });
@@ -219,9 +220,9 @@ void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* background, P
 	if (pge->GetKey(olc::SPACE).bPressed)
 	{
 		titleScreen = false;
-		audio->soundPlayed = false;
-		audio->PlaySoundSample(pge, 1, 11);
-		audio->soundPlayed = false;
+		_Audio->soundPlayed = false;
+		_Audio->PlaySoundSample(pge, 1, 11);
+		_Audio->soundPlayed = false;
 	}
 }
 
@@ -251,27 +252,18 @@ void Interface::LandingMessages(olc::PixelGameEngine* pge, int totalVelocity, in
 		break;
 	}
 
-	pge->DrawStringDecal(
-		{ int(screenWidth * 0.47f), int(screenHeight * 0.2f) }, "+" + std::to_string(gainedScore));
-
-	pge->DrawStringDecal(
-		{ int(screenWidth * 0.435f), int(screenHeight * 0.3f) },
-		"+500 fuel",
-		olc::DARK_GREY);
-
-	pge->DrawStringDecal(
-		{ screenWidth * 0.33f, screenHeight * 0.8f },
-		"Press SPACE to continue!");
+	pge->DrawStringDecal({ int(screenWidth * 0.47f), int(screenHeight * 0.2f) }, "+" + std::to_string(gainedScore));
+	pge->DrawStringDecal({ int(screenWidth * 0.435f), int(screenHeight * 0.3f) }, "+500 fuel", olc::DARK_GREY);
+	pge->DrawStringDecal({ screenWidth * 0.33f, screenHeight * 0.8f }, "Press SPACE to continue!");
 }
 
-void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* fileHandler, int totalVelocity, int currentScore)
+void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* _FileHandler, int totalVelocity, int currentScore)
 {
-	int highScore = fileHandler->ReadOrCreateFile();
+	int highScore = _FileHandler->ReadOrCreateFile();
 
 	if (highScore == -1 || highScore < currentScore)
-		fileHandler->OverwriteScore(currentScore);
-
-	if (highScore == currentScore)
+		_FileHandler->OverwriteScore(currentScore);
+	else if (highScore == currentScore)
 		pge->DrawStringDecal({ int(screenWidth * 0.4f), int(screenHeight * 0.3f) }, "NEW HIGH SCORE!");
 
 	if (totalVelocity < 7)

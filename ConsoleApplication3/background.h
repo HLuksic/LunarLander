@@ -22,6 +22,6 @@ private:
 	std::vector<sStar> vecStars;
 
 public:
-	void Draw(olc::PixelGameEngine* pge, Player* player);
+	void Draw(olc::PixelGameEngine* pge, Player* _Player);
 	void Reset();
 };

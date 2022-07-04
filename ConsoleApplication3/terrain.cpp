@@ -11,18 +11,18 @@ Terrain::Terrain()
 }
 
 template<typename T>
-void Terrain::CreateNewSegment(T terrain, bool left, olc::vf2d distanceX, olc::vf2d distanceY)
+void Terrain::CreateNewSegment(T _Terrain, bool left, olc::vf2d distanceX, olc::vf2d distanceY)
 {
 	// New rightNode is the previous back() segments leftNode
 	// New leftNode is random with regard to previous back() segments leftNode
 	if (left)
 	{
-		olc::vf2d newRightNode = terrain->back().leftNode;
+		olc::vf2d newRightNode = _Terrain->back().leftNode;
 		olc::vf2d newLeftNode = {
-			terrain->back().leftNode.x - RandFloat(distanceX.x, distanceX.y),
-			terrain->back().leftNode.y + RandFloat(distanceY.x, distanceY.y) };
+			_Terrain->back().leftNode.x - RandFloat(distanceX.x, distanceX.y),
+			_Terrain->back().leftNode.y + RandFloat(distanceY.x, distanceY.y) };
 
-		terrain->push_back({
+		_Terrain->push_back({
 			GetGroundAngle(newLeftNode, newRightNode),
 			false,
 			newLeftNode,
@@ -30,12 +30,12 @@ void Terrain::CreateNewSegment(T terrain, bool left, olc::vf2d distanceX, olc::v
 	}
 	else
 	{
-		olc::vf2d newLeftNode = terrain->front().rightNode;
+		olc::vf2d newLeftNode = _Terrain->front().rightNode;
 		olc::vf2d newRightNode = {
-			terrain->front().rightNode.x + RandFloat(distanceX.x, distanceX.y),
-			terrain->front().rightNode.y + RandFloat(distanceY.x, distanceY.y) };
+			_Terrain->front().rightNode.x + RandFloat(distanceX.x, distanceX.y),
+			_Terrain->front().rightNode.y + RandFloat(distanceY.x, distanceY.y) };
 
-		terrain->push_front({
+		_Terrain->push_front({
 			GetGroundAngle(newLeftNode, newRightNode),
 			false,
 			newLeftNode,
@@ -43,17 +43,17 @@ void Terrain::CreateNewSegment(T terrain, bool left, olc::vf2d distanceX, olc::v
 	}
 }
 
-void Terrain::Spawn(Player* player)
+void Terrain::Spawn(Player* _Player)
 {
 	// Spawn first nodes
 	if (!deqSegments.size() && !deqBackgroundSegments.size())
 	{
 		olc::vf2d node1 = {
-			player->position.x - 20.0f,
+			_Player->position.x - 20.0f,
 			RandFloat(screenHeight * 1.3f, screenHeight * 1.6f) };
 
 		olc::vf2d node2 = {
-			player->position.x + 20.0f,
+			_Player->position.x + 20.0f,
 			RandFloat(screenHeight * 1.3f, screenHeight * 1.6f) };
 
 		deqSegments.push_back({
@@ -65,8 +65,8 @@ void Terrain::Spawn(Player* player)
 		deqBackgroundSegments.push_back({
 			0.0f,
 			false,
-			{ player->position.x - 7.0f, RandFloat(screenHeight * 0.9f, screenHeight * 1.0f) },
-			{ player->position.x + 7.0f, RandFloat(screenHeight * 0.9f, screenHeight * 1.0f) } });
+			{ _Player->position.x - 7.0f, RandFloat(screenHeight * 0.9f, screenHeight * 1.0f) },
+			{ _Player->position.x + 7.0f, RandFloat(screenHeight * 0.9f, screenHeight * 1.0f) } });
 	}
 
 	// If the front or back terrain segment is near the screen border, spawn new ones
@@ -85,56 +85,56 @@ void Terrain::Spawn(Player* player)
 
 void Terrain::Collision(
 	olc::PixelGameEngine* pge, 
-	Player* player, 
-	Background* background, 
-	Interface* userInterface, 
-	FileHandler* fileHandler,
-	Audio* audio)
+	Player* _Player, 
+	Background* _Background, 
+	Interface* _Interface, 
+	FileHandler* _FileHandler,
+	Audio* _Audio)
 {
 	for (auto& segment : deqSegments)
 	{
 		// Get segment directly under player
-		if (segment.leftNode.x < player->position.x && segment.rightNode.x > player->position.x)
+		if (segment.leftNode.x < _Player->position.x && segment.rightNode.x > _Player->position.x)
 		{
 			// Calculate point directly under player
-			player->currentSegmentAngle = segment.angle;
+			_Player->currentSegmentAngle = segment.angle;
 			float diffY = segment.rightNode.y - segment.leftNode.y;
 			float diffX = segment.rightNode.x - segment.leftNode.x;
-			float mult = (player->position.x - segment.leftNode.x) / diffX;
+			float mult = (_Player->position.x - segment.leftNode.x) / diffX;
 
 			// Altitude = Y distance to the point, + 7 for lower edge of player sprite
-			player->altitude = ((segment.leftNode.y + diffY * mult) - (player->position.y + 7)) / 3;
+			_Player->altitude = ((segment.leftNode.y + diffY * mult) - (_Player->position.y + 7)) / 3;
 
-			if (player->altitude < 0.7f)
+			if (_Player->altitude < 0.7f)
 			{
-				player->LandingHandler(pge, segment, background, this, userInterface, fileHandler, audio);
+				_Player->LandingHandler(pge, segment, _Background, this, _Interface, _FileHandler, _Audio);
 				break;
 			}
 		}
 	}
 }
 
-void Terrain::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTime)
+void Terrain::Draw(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTime)
 {
 	for (auto& segment : deqBackgroundSegments)
 	{
 		// Terrain moves inversely to player
 		if (!paused)
 		{
-			segment.leftNode += player->velocity * -0.3f * fElapsedTime;
-			segment.rightNode += player->velocity * -0.3f * fElapsedTime;
+			segment.leftNode += _Player->velocity * -0.3f * fElapsedTime;
+			segment.rightNode += _Player->velocity * -0.3f * fElapsedTime;
 		}
 
 		// Find segments on screen
-		if (segment.rightNode.x < screenWidth / scale - player->adjustedPosition.x &&
-			segment.leftNode.x > -screenWidth / scale + player->adjustedPosition.x)
+		if (segment.rightNode.x < screenWidth / scale - _Player->adjustedPosition.x &&
+			segment.leftNode.x > -screenWidth / scale + _Player->adjustedPosition.x)
 			pge->DrawWarpedDecal(
 				decSurface.get(),
 				{ 
-					segment.leftNode * scale + player->adjustedPosition,
-					segment.rightNode * scale + player->adjustedPosition,
-					olc::vf2d(segment.rightNode.x, segment.rightNode.y + 200.0f) * scale + player->adjustedPosition,
-					olc::vf2d(segment.leftNode.x, segment.leftNode.y + 200.0f) * scale + player->adjustedPosition 
+					segment.leftNode * scale + _Player->adjustedPosition,
+					segment.rightNode * scale + _Player->adjustedPosition,
+					olc::vf2d(segment.rightNode.x, segment.rightNode.y + 200.0f) * scale + _Player->adjustedPosition,
+					olc::vf2d(segment.leftNode.x, segment.leftNode.y + 200.0f) * scale + _Player->adjustedPosition 
 				},
 				olc::VERY_DARK_GREY);
 	}
@@ -143,32 +143,32 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTime
 	{
 		if (!paused)
 		{
-			segment.leftNode += player->velocity * -1.0f * fElapsedTime;
-			segment.rightNode += player->velocity * -1.0f * fElapsedTime;
+			segment.leftNode += _Player->velocity * -1.0f * fElapsedTime;
+			segment.rightNode += _Player->velocity * -1.0f * fElapsedTime;
 		}
 
-		if (segment.rightNode.x < screenWidth / scale - player->adjustedPosition.x &&
-			segment.leftNode.x > -screenWidth / scale + player->adjustedPosition.x)
+		if (segment.rightNode.x < screenWidth / scale - _Player->adjustedPosition.x &&
+			segment.leftNode.x > -screenWidth / scale + _Player->adjustedPosition.x)
 		{
 			// Landable segments are WHITE, non-landable are DARK_GREY
 			if (abs(segment.angle) <= 0.349f && !segment.visited)
 				pge->DrawWarpedDecal(
 					decSurface.get(),
 					{
-						segment.leftNode * scale + player->adjustedPosition,
-						segment.rightNode * scale + player->adjustedPosition,
-						olc::vf2d(segment.rightNode.x, segment.rightNode.y + 500.0f) * scale + player->adjustedPosition,
-						olc::vf2d(segment.leftNode.x, segment.leftNode.y + 500.0f) * scale + player->adjustedPosition
+						segment.leftNode * scale + _Player->adjustedPosition,
+						segment.rightNode * scale + _Player->adjustedPosition,
+						olc::vf2d(segment.rightNode.x, segment.rightNode.y + 500.0f) * scale + _Player->adjustedPosition,
+						olc::vf2d(segment.leftNode.x, segment.leftNode.y + 500.0f) * scale + _Player->adjustedPosition
 					},
 					olc::WHITE);
 			else
 				pge->DrawWarpedDecal(
 					decSurface.get(),
 					{
-						segment.leftNode * scale + player->adjustedPosition,
-						segment.rightNode * scale + player->adjustedPosition,
-						olc::vf2d(segment.rightNode.x, segment.rightNode.y + 500.0f) * scale + player->adjustedPosition,
-						olc::vf2d(segment.leftNode.x, segment.leftNode.y + 500.0f) * scale + player->adjustedPosition
+						segment.leftNode * scale + _Player->adjustedPosition,
+						segment.rightNode * scale + _Player->adjustedPosition,
+						olc::vf2d(segment.rightNode.x, segment.rightNode.y + 500.0f) * scale + _Player->adjustedPosition,
+						olc::vf2d(segment.leftNode.x, segment.leftNode.y + 500.0f) * scale + _Player->adjustedPosition
 					},
 					olc::DARK_GREY);
 		}

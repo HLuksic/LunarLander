@@ -21,27 +21,27 @@ public:
 	}
 
 private:
-	Player* player;
-	Terrain* terrain;
-	Interface* userInterface;
-	Background* background;
-	FileHandler* fileHandler;
-	Audio* audio;
+	Audio* _Audio;
+	Player* _Player;
+	Terrain* _Terrain;
+	Interface* _Interface;
+	Background* _Background;
+	FileHandler* _FileHandler;
 
 public:
 	bool OnUserCreate() override
 	{
 		srand((unsigned int)time(0));
 
-		player        = new Player;
-		terrain       = new Terrain;
-		userInterface = new Interface;
-		background    = new Background;
-		fileHandler   = new FileHandler;
-		audio         = new Audio;
-		paused        = false;
-		titleScreen   = true;
-		scale         = 0.5f;
+		_Audio       = new Audio;
+		_Player      = new Player;
+		_Terrain     = new Terrain;
+		_Interface   = new Interface;
+		_Background  = new Background;
+		_FileHandler = new FileHandler;
+		paused       = false;
+		titleScreen  = true;
+		scale        = 0.5f;
 
 		olc::SOUND::InitialiseAudio();
 
@@ -59,21 +59,21 @@ public:
 			paused = false;
 
 		if (titleScreen)
-			userInterface->TitleScreen(this, background, player, fileHandler, audio);
+			_Interface->TitleScreen(this, _Background, _Player, _FileHandler, _Audio);
 		else
 		{
-			background->Draw(this, player);
+			_Background->Draw(this, _Player);
 			
-			terrain->Spawn(player);
-			terrain->Collision(this, player, background, userInterface, fileHandler, audio);
-			terrain->Draw(this, player, fElapsedTime);
+			_Terrain->Spawn(_Player);
+			_Terrain->Collision(this, _Player, _Background, _Interface, _FileHandler, _Audio);
+			_Terrain->Draw(this, _Player, fElapsedTime);
 			
-			player->Physics(this, terrain, audio, fElapsedTime);
-			player->Draw(this, fElapsedTime);
+			_Player->Physics(this, _Terrain, _Audio, fElapsedTime);
+			_Player->Draw(this, fElapsedTime);
 
-			userInterface->Draw(this, player, fileHandler, fElapsedTime);
+			_Interface->Draw(this, _Player, _FileHandler, fElapsedTime);
 
-			audio->Play(this, player);
+			_Audio->Play(this, _Player);
 		}
 		return true;
 	}
@@ -81,7 +81,7 @@ public:
 	virtual bool OnUserDestroy()
 	{
 		olc::SOUND::DestroyAudio();
-		delete player, terrain, background, userInterface, fileHandler, audio;
+		delete _Player, _Terrain, _Background, _Interface, _FileHandler, _Audio;
 
 		return true;
 	}

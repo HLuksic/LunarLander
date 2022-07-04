@@ -32,16 +32,16 @@ private:
 public:
 	void Collision(
 		olc::PixelGameEngine* pge, 
-		Player* player, 
-		Background* background, 
-		Interface* userInterface, 
-		FileHandler* fileHandler,
-		Audio* audio);
-	void Spawn(Player* player);
-	void Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTime);
+		Player* _Player, 
+		Background* _Background, 
+		Interface* _Interface, 
+		FileHandler* _FileHandler,
+		Audio* _Audio);
+	void Spawn(Player* _Player);
+	void Draw(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTime);
 	float GetGroundAngle(olc::vf2d node1, olc::vf2d node2);
 	void Reset();
 private:
 	template<typename T>
-	void CreateNewSegment(T terrain, bool left, olc::vf2d distanceX, olc::vf2d distanceY);
+	void CreateNewSegment(T _Terrain, bool left, olc::vf2d distanceX, olc::vf2d distanceY);
 };

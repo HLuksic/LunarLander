@@ -10,8 +10,7 @@
 
 // TODO: 
 // FOREGROUND,
-// DEBRIS PARTICLES,
-// UI TEXT FIXES
+// FANCY FUEL GAUGE
 
 class lunarLander : public olc::PixelGameEngine
 {
@@ -72,7 +71,7 @@ public:
 			player->Physics(this, terrain, audio, fElapsedTime);
 			player->Draw(this, fElapsedTime);
 
-			userInterface->Draw(this, player, fElapsedTime);
+			userInterface->Draw(this, player, fileHandler, fElapsedTime);
 
 			audio->Play(this, player);
 		}

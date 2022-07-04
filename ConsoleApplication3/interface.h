@@ -18,8 +18,8 @@ private:
 	const std::string crew[14];
 
 public:
-	void Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTime);
+	void Draw(olc::PixelGameEngine* pge, Player* player, FileHandler* fileHandler, float fElapsedTime);
 	void TitleScreen(olc::PixelGameEngine* pge, Background* background, Player* player, FileHandler* fileHandler, Audio* audio);
-	void LandingMessages(olc::PixelGameEngine* pge, sSegment& segment, int vel);
+	void LandingMessages(olc::PixelGameEngine* pge, int vel, int gainedScore);
 	void DeathMessages(olc::PixelGameEngine* pge, FileHandler* fileHandler, int velocity, int currentScore);
 };

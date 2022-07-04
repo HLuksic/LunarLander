@@ -34,7 +34,7 @@ Interface::Interface() :
 {
 }
 
-void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTime)
+void Interface::Draw(olc::PixelGameEngine* pge, Player* player, FileHandler* fileHandler, float fElapsedTime)
 {
 	static float textTime = 0.0f;
 
@@ -80,10 +80,15 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 					olc::vf2d(1.0f, 1.0f) * scale);
 	}
 
+	if (paused && !player->dead && player->altitude < 0.7f)
+		LandingMessages(pge, player->normalizedHorizontalVelocity + player->normalizedVerticalVelocity, player->gainedScore);
+
+	if (paused && player->dead)
+		DeathMessages(pge, fileHandler, player->normalizedHorizontalVelocity + player->normalizedVerticalVelocity, player->score);
 	/////////////////////////////////////////////////////////////
 	//                        Comms                            //
 	/////////////////////////////////////////////////////////////
-	static float   time               = 0.0f;
+	static float   _time               = 0.0f;
 	static float   randomTime         = RandFloat(50.0f, 70.0f);
 	static bool    randomVariablesSet = false;
 	static bool    isMessageOnScreen  = false;
@@ -104,38 +109,38 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* player, float fElapsedTi
 	}
 
 	if (!paused)
-		time += fElapsedTime;
+		_time += fElapsedTime;
 
 	// Allow messsages in ESC-pause, but not landed-pause
 	if (player->altitude > 0.7f)
 	{
-		if (time > randomTime)
+		if (_time > randomTime)
 		{
 			// Command message
-			if (time < randomTime + 8.0f)
+			if (_time < randomTime + 8.0f)
 				pge->DrawStringDecal(
 					{ screenWidth * 0.05f, screenHeight * 0.25f },
 					"Command:\n" + command[randomControlQuestion],
 					olc::GREY);
 
 			// Crew response
-			if (time > randomTime + 3.0f && time < randomTime + 8.0f)
+			if (_time > randomTime + 3.0f && _time < randomTime + 8.0f)
 				pge->DrawStringDecal(
 					{ screenWidth * 0.05f, screenHeight * 0.3f },
 					"Eagle:\n" + crew[randomCrewReponse],
 					olc::GREY);
 
 			// Reset timers when done
-			if (time > randomTime + 8.0f)
+			if (_time > randomTime + 8.0f)
 			{
 				randomVariablesSet = false;
 				randomTime = RandFloat(50.0f, 70.0f);
-				time = 0.0f;
+				_time = 0.0f;
 			}
 		}
 
 		// Crew chatter
-		if (time > randomTime / 2 && time < randomTime / 2 + 7.0f && player->altitude > 4.0f)
+		if (_time > randomTime / 2 && _time < randomTime / 2 + 7.0f && player->altitude > 4.0f)
 			pge->DrawStringDecal(
 				{ screenWidth * 0.05f, screenHeight * 0.35f },
 				crew[randomName] + crew[randomCrewChatter],
@@ -216,13 +221,13 @@ void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* background, P
 		titleScreen = false;
 		audio->soundPlayed = false;
 		audio->PlaySoundSample(pge, 1, 11);
-		audio->soundPlayed = true;
+		audio->soundPlayed = false;
 	}
 }
 
-void Interface::LandingMessages(olc::PixelGameEngine* pge, sSegment& segment, int vel)
+void Interface::LandingMessages(olc::PixelGameEngine* pge, int totalVelocity, int gainedScore)
 {
-	switch (vel)
+	switch (totalVelocity)
 	{
 	case 0:
 		pge->DrawStringDecal({ int(screenWidth * 0.39f), int(screenHeight * 0.25f) }, "PERFECT LANDING!");
@@ -247,8 +252,7 @@ void Interface::LandingMessages(olc::PixelGameEngine* pge, sSegment& segment, in
 	}
 
 	pge->DrawStringDecal(
-		{ int(screenWidth * 0.47f), int(screenHeight * 0.2f) },
-		"+" + std::to_string(int(50 + abs(segment.angle) * 544 * (5 - vel))));
+		{ int(screenWidth * 0.47f), int(screenHeight * 0.2f) }, "+" + std::to_string(gainedScore));
 
 	pge->DrawStringDecal(
 		{ int(screenWidth * 0.435f), int(screenHeight * 0.3f) },
@@ -260,7 +264,7 @@ void Interface::LandingMessages(olc::PixelGameEngine* pge, sSegment& segment, in
 		"Press SPACE to continue!");
 }
 
-void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* fileHandler, int velocity, int currentScore)
+void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* fileHandler, int totalVelocity, int currentScore)
 {
 	int highScore = fileHandler->ReadOrCreateFile();
 
@@ -270,11 +274,11 @@ void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* fileHandle
 	if (highScore == currentScore)
 		pge->DrawStringDecal({ int(screenWidth * 0.4f), int(screenHeight * 0.3f) }, "NEW HIGH SCORE!");
 
-	if (velocity < 7)
+	if (totalVelocity < 7)
 		pge->DrawStringDecal({ int(screenWidth * 0.31f), int(screenHeight * 0.25f) }, "You broke the landing gear!");
-	else if (velocity < 12)
+	else if (totalVelocity < 12)
 		pge->DrawStringDecal({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "You crashed it!");
-	else if (velocity < 20)
+	else if (totalVelocity < 20)
 		pge->DrawStringDecal({ int(screenWidth * 0.4f), int(screenHeight * 0.25f) }, "You wrecked it!");
 	else
 		pge->DrawStringDecal({ int(screenWidth * 0.37f), int(screenHeight * 0.25f) }, "YOU BLEW A CRATER!");

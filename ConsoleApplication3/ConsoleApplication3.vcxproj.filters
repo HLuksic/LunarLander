@@ -147,5 +147,8 @@
     <Media Include="..\sfx\start.wav">
       <Filter>Resource Files\Sounds</Filter>
     </Media>
+    <Media Include="..\sfx\lowFuel.wav">
+      <Filter>Resource Files\Sounds</Filter>
+    </Media>
   </ItemGroup>
 </Project>

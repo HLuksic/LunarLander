@@ -171,9 +171,9 @@ void Player::LandingHandler(
 	FileHandler* fileHandler,
 	Audio* audio)
 {
-	int velocity = normalizedHorizontalVelocity + normalizedVerticalVelocity;
+	//int velocity = normalizedHorizontalVelocity + normalizedVerticalVelocity;
 	
-	paused = true; // Pause game while landed
+	paused = true;
 	
 	// Successful landing
 	if (normalizedHorizontalVelocity <= 3      &&
@@ -182,8 +182,8 @@ void Player::LandingHandler(
 	    abs(angle - segment.angle)   <= 0.087f &&  // 5 degrees
 	    !segment.visited)
 	{
-		userInterface->LandingMessages(pge, segment, velocity);
-
+		gainedScore = int(50 + abs(segment.angle) * 544 * (5 - (normalizedHorizontalVelocity + normalizedVerticalVelocity)));
+		
 		audio->PlaySoundSample(pge, 3, 3);
 
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
@@ -194,7 +194,7 @@ void Player::LandingHandler(
 
 			// Launch player based on ground angle
 			this->velocity  = { -cos(angle + HALFPI) * 90.0f, -sin(angle + HALFPI) * 90.0f };
-			score          += int(50 + abs(segment.angle) * 544 * (5 - velocity));
+			score          += gainedScore;
 			fuel           += 500;
 			landings       += 1;
 			segment.visited = true;
@@ -205,7 +205,6 @@ void Player::LandingHandler(
 	{
 		dead = true;
 
-		userInterface->DeathMessages(pge, fileHandler, velocity, int(score));
 		audio->PlaySoundSample(pge, 2, 9);
 
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
@@ -213,11 +212,13 @@ void Player::LandingHandler(
 			this->Reset();
 			background->Reset();
 			terrain->Reset();
+			adjustedPosition = position * 0.5f;
+			scale            = 0.5f;
+			paused           = false;
+			
 			audio->soundPlayed = false;
 			audio->PlaySoundSample(pge, 1, 11);
 			audio->soundPlayed = false;
-
-			paused = false;
 		}
 	}
 }
@@ -249,7 +250,7 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* terrain, Audio* audio, 
 		if (pge->GetKey(olc::Key::W).bHeld && (int)fuel)
 		{
 			thrust = -40.0f;
-			fuel  -= 100.0f * fElapsedTime; // 100 kg fuel/second
+			fuel  -= 100.0f * fElapsedTime; // -100 fuel/second
 		}
 		else
 			thrust = 0.0f;
@@ -283,11 +284,16 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* terrain, Audio* audio, 
 		}
 	}
 
-	if (this->fuel == 500)
+	static bool lowFuelSoundPlayed;
+
+	if ((int)this->fuel > 500.0f)
+		lowFuelSoundPlayed = false;
+
+	if ((int)this->fuel < 500.0f && !lowFuelSoundPlayed)
 	{
+		audio->PlaySoundSample(pge, 1, 12);
 		audio->soundPlayed = false;
-		audio->PlaySoundSample(pge, 1, 13);
-		audio->soundPlayed = false;
+		lowFuelSoundPlayed = true;
 	}
 }
 

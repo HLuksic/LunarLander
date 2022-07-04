@@ -184,6 +184,7 @@
     <Media Include="..\sfx\landing2.wav" />
     <Media Include="..\sfx\landing3.wav" />
     <Media Include="..\sfx\launch.wav" />
+    <Media Include="..\sfx\lowFuel.wav" />
     <Media Include="..\sfx\start.wav" />
     <Media Include="..\sfx\thruster.wav" />
   </ItemGroup>

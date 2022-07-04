@@ -21,6 +21,7 @@ public:
 	float	  fuel;
 	float	  currentSegmentAngle;
 	bool	  dead;
+	uint16_t  gainedScore;
 	uint16_t  landings;
 	uint16_t  normalizedHorizontalVelocity;
 	uint16_t  normalizedVerticalVelocity;

@@ -17,8 +17,9 @@ public:
 
 public:
 	std::unique_ptr<olc::Sprite> sprEarth;
+	std::unique_ptr<olc::Decal>	 decEarth;
 private:
-	olc::vf2d earthPos;
+	olc::vf2d          earthPos;
 	std::vector<sStar> vecStars;
 
 public:

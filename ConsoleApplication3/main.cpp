@@ -9,8 +9,7 @@
 #include "global.h"
 
 // TODO: 
-// FOREGROUND,
-// FANCY FUEL GAUGE
+// FOREGROUND
 
 class lunarLander : public olc::PixelGameEngine
 {
@@ -65,7 +64,7 @@ public:
 			_Background->Draw(this, _Player);
 			
 			_Terrain->Spawn(_Player);
-			_Terrain->Collision(this, _Player, _Background, _Interface, _FileHandler, _Audio);
+			_Terrain->Collision(this, _Player, _Background, _Interface, _FileHandler, _Audio, fElapsedTime);
 			_Terrain->Draw(this, _Player, fElapsedTime);
 			
 			_Player->Physics(this, _Terrain, _Audio, fElapsedTime);

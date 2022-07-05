@@ -36,7 +36,8 @@ public:
 		Background* _Background, 
 		Interface* _Interface, 
 		FileHandler* _FileHandler,
-		Audio* _Audio);
+		Audio* _Audio,
+		float fElapsedTime);
 	void Spawn(Player* _Player);
 	void Draw(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTime);
 	float GetGroundAngle(olc::vf2d node1, olc::vf2d node2);

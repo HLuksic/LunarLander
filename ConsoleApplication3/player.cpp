@@ -17,7 +17,6 @@ Player::Player()
 	sprPlayer             = std::make_unique<olc::Sprite>("../gfx/lander.png");
 	sprBurner             = std::make_unique<olc::Sprite>("../gfx/burner.png");
 	sprEnd                = std::make_unique<olc::Sprite>("../gfx/end.png");
-
 	decPlayerLightDamage  = std::make_unique<olc::Decal>(sprPlayerLightDamage.get());
 	decPlayerMediumDamage = std::make_unique<olc::Decal>(sprPlayerMediumDamage.get());
 	decPlayerHeavyDamage  = std::make_unique<olc::Decal>(sprPlayerHeavyDamage.get());
@@ -167,24 +166,27 @@ void Player::LandingHandler(
 	sSegment& segment, 
 	Background* _Background,
 	Terrain* _Terrain,
-	Interface* _Interface,
-	FileHandler* _FileHandler,
-	Audio* _Audio)
+	Audio* _Audio,
+	float fElapsedTime)
 {
-	//int velocity = normalizedHorizontalVelocity + normalizedVerticalVelocity;
-	
+	static bool statsUpdated = false;
+
 	paused = true;
 	
 	// Successful landing
-	if (normalizedHorizontalVelocity <= 3      &&
-	    normalizedVerticalVelocity   <= 2      &&
-	    abs(segment.angle)           <= 0.349f &&  // 20 degrees
-	    abs(angle - segment.angle)   <= 0.087f &&  // 5 degrees
-	    !segment.visited)
+	if (LandingSuccessful(segment))
 	{
 		gainedScore = int(50 + abs(segment.angle) * 544 * (5 - (normalizedHorizontalVelocity + normalizedVerticalVelocity)));
 		
 		_Audio->PlaySoundSample(pge, 3, 3);
+		
+		if (!statsUpdated)
+		{
+			score       += gainedScore;
+			fuel        += 500;
+			landings    += 1;
+			statsUpdated = true;
+		}
 
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
 		{
@@ -194,11 +196,9 @@ void Player::LandingHandler(
 
 			// Launch player based on ground angle
 			this->velocity  = { -cos(angle + HALFPI) * 90.0f, -sin(angle + HALFPI) * 90.0f };
-			score          += gainedScore;
-			fuel           += 500;
-			landings       += 1;
-			segment.visited = true;
 			paused          = false;
+			statsUpdated    = false;
+			segment.visited = true;
 		}
 	}
 	else
@@ -226,6 +226,9 @@ void Player::LandingHandler(
 void Player::Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio, float fElapsedTime)
 {
 	static float Time = 0.0f;
+
+	if (fuel > 2250.0f)
+		fuel = 2250.0f;
 
 	// Divide by 3 for believable velocity, this is what's displayed
 	normalizedHorizontalVelocity = abs((int)(velocity.x / 3));
@@ -293,7 +296,7 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio
 	{
 		_Audio->PlaySoundSample(pge, 1, 12);
 		_Audio->soundPlayed = false;
-		lowFuelSoundPlayed = true;
+		lowFuelSoundPlayed  = true;
 	}
 }
 
@@ -307,4 +310,13 @@ void Player::Reset()
 	fuel     = 2250;
 	landings = 0;
 	dead     = false;
+}
+
+bool Player::LandingSuccessful(sSegment& segment)
+{
+	return (!segment.visited                        &&
+		    normalizedHorizontalVelocity <= 3       &&
+            normalizedVerticalVelocity   <= 2       &&
+            abs(segment.angle)           <= 0.349f  &&  // 20 degrees
+            abs(angle - segment.angle)   <= 0.087f);    // 5 degrees
 }

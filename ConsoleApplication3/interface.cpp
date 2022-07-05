@@ -32,15 +32,17 @@ Interface::Interface() :
 		"\nWe're low on fuel!"                          // fuel
 	}
 {
+	sprBar = std::make_unique<olc::Sprite>("../gfx/bar.png");
+	decBar = std::make_unique<olc::Decal>(sprBar.get());
 }
 
 void Interface::Draw(olc::PixelGameEngine* pge, Player* _Player, FileHandler* _FileHandler, float fElapsedTime)
 {
+	FuelGauge(pge, _Player);
+	Comms(pge, _Player, fElapsedTime);
+
 	static float textTime = 0.0f;
 
-	/////////////////////////////////////////////////////////////
-	//                       Main UI                           //
-	/////////////////////////////////////////////////////////////
 	if (textTime < 3.0f)
 	{
 		pge->DrawStringDecal({ int(screenWidth * 0.27f), int(screenHeight * 0.25f) }, "Land on the highlighted segments!");
@@ -49,20 +51,13 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* _Player, FileHandler* _F
 
 	// Distinguish between ESC-pause and landed-pause
 	if (paused && (int)_Player->altitude)
-	{
 		pge->DrawStringDecal({ int(screenWidth * 0.33f), int(screenHeight * 0.7f) }, "         PAUSED\n\nPress SPACE to continue!");
-		pge->DrawStringDecal({ int(screenWidth * 0.05f), int(screenHeight * 0.1f) }, "Velocity", olc::DARK_GREY);
-		pge->DrawStringDecal({ int(screenWidth * 0.85f), int(screenHeight * 0.1f) }, "Fuel\nLandings", olc::DARK_GREY);
-		pge->DrawStringDecal({ int(screenWidth * 0.45f), int(screenHeight * 0.1f) }, "Score", olc::DARK_GREY);
-		pge->DrawStringDecal({ int(screenWidth * 0.55f), int(screenHeight * 0.4f), }, "Altitude", olc::DARK_GREY);
-	}
 
 	std::vector<std::pair<olc::vf2d, std::string>> ui = {
-		{ {screenWidth * 0.05f, screenHeight * 0.05f}, "H.V. " + std::to_string(_Player->normalizedHorizontalVelocity) + "m/s" },
-		{ {screenWidth * 0.05f, screenHeight * 0.07f}, "V.V. " + std::to_string(_Player->normalizedVerticalVelocity) + "m/s" },
-		{ {screenWidth * 0.85f, screenHeight * 0.05f}, "F " + std::to_string((int)_Player->fuel) + "kg"},
-		{ {screenWidth * 0.85f, screenHeight * 0.07f}, "L " + std::to_string(_Player->landings) },
-		{ {screenWidth * 0.47f, screenHeight * 0.05f}, std::to_string((int)_Player->score) },
+		{ {screenWidth * 0.03f, screenHeight * 0.03f}, "H.V. " + std::to_string(_Player->normalizedHorizontalVelocity) + "m/s" },
+		{ {screenWidth * 0.03f, screenHeight * 0.05f}, "V.V. " + std::to_string(_Player->normalizedVerticalVelocity) + "m/s" },
+		{ {screenWidth * 0.88f, screenHeight * 0.03f}, "S " + std::to_string((int)_Player->score)},
+		{ {screenWidth * 0.88f, screenHeight * 0.05f}, "L " + std::to_string(_Player->landings) },
 		{ _Player->position * scale + _Player->adjustedPosition, std::to_string((int)_Player->altitude) + "m" } };
 
 	for (auto& line : ui)
@@ -84,87 +79,7 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* _Player, FileHandler* _F
 		LandingMessages(pge, _Player->normalizedHorizontalVelocity + _Player->normalizedVerticalVelocity, _Player->gainedScore);
 
 	if (paused && _Player->dead)
-		DeathMessages(pge, _FileHandler, _Player->normalizedHorizontalVelocity + _Player->normalizedVerticalVelocity, _Player->score);
-
-	/////////////////////////////////////////////////////////////
-	//                        Comms                            //
-	/////////////////////////////////////////////////////////////
-	static float   _time              = 0.0f;
-	static float   randomTime         = RandFloat(50.0f, 70.0f);
-	static bool    randomVariablesSet = false;
-	static bool    isMessageOnScreen  = false;
-	static uint8_t randomControlQuestion;
-	static uint8_t randomCrewReponse;
-	static uint8_t randomCrewChatter;
-	static uint8_t randomLowAltWarning;
-	static uint8_t randomName;
-
-	if (!randomVariablesSet || _Player->dead)
-	{
-		randomControlQuestion = rand() % 5;
-		randomCrewReponse     = rand() % 4;
-		randomCrewChatter     = rand() % 3 + 4;
-		randomLowAltWarning   = rand() % 3 + 7;
-		randomName            = rand() % 3 + 10;
-		randomVariablesSet    = true;
-	}
-
-	if (!paused)
-		_time += fElapsedTime;
-
-	// Allow messsages in ESC-pause, but not landed-pause
-	if (_Player->altitude > 0.7f)
-	{
-		if (_time > randomTime)
-		{
-			// Command message
-			if (_time < randomTime + 8.0f)
-				pge->DrawStringDecal(
-					{ screenWidth * 0.05f, screenHeight * 0.25f },
-					"Command:\n" + command[randomControlQuestion],
-					olc::GREY);
-
-			// Crew response
-			if (_time > randomTime + 3.0f && _time < randomTime + 8.0f)
-				pge->DrawStringDecal(
-					{ screenWidth * 0.05f, screenHeight * 0.3f },
-					"Eagle:\n" + crew[randomCrewReponse],
-					olc::GREY);
-
-			// Reset timers when done
-			if (_time > randomTime + 8.0f)
-			{
-				randomVariablesSet = false;
-				randomTime = RandFloat(50.0f, 70.0f);
-				_time = 0.0f;
-			}
-		}
-
-		// Crew chatter
-		if (_time > randomTime / 2 && _time < randomTime / 2 + 7.0f && _Player->altitude > 4.0f)
-			pge->DrawStringDecal(
-				{ screenWidth * 0.05f, screenHeight * 0.35f },
-				crew[randomName] + crew[randomCrewChatter],
-				olc::GREY);
-		
-		// Low fuel
-		if (_Player->fuel < 500)
-		{
-			pge->DrawStringDecal(
-				{ screenWidth * 0.05f, screenHeight * 0.45f },
-				crew[10] + crew[13],
-				olc::GREY);
-		}
-
-		// Low alt
-		if (_Player->altitude < 4.0f && abs(_Player->currentSegmentAngle) <= 0.349f)
-			pge->DrawStringDecal(
-				{ screenWidth * 0.05f, screenHeight * 0.4f },
-				crew[randomName] + crew[randomLowAltWarning],
-				olc::GREY);
-		else
-			randomLowAltWarning = rand() % 3 + 7;
-	}
+		DeathMessages(pge, _FileHandler, _Player->normalizedHorizontalVelocity + _Player->normalizedVerticalVelocity, (int)_Player->score);
 }
 
 void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* _Background, Player* _Player, FileHandler* _FileHandler, Audio* _Audio)
@@ -175,7 +90,7 @@ void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* _Background, 
 		pge->DrawString({ 30, 70 }, "High score: " + std::to_string(highScore));
 
 	//TODO: CONVERT TO VECTOR OF PAIRS LIKE MAIN UI
-	pge->DrawSprite({ 430, 30 }, _Background->sprEarth.get(), 3U);
+	pge->DrawDecal({ 430, 30 }, _Background->decEarth.get(), { 3.0f, 3.0f });
 
 	pge->DrawRotatedStringDecal({ screenWidth * 0.05f, screenHeight * 0.05f }, "   CONTROLS", 0.0f, { 0.0f, 0.0f }, olc::GREY);
 
@@ -276,4 +191,93 @@ void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* _FileHandl
 		pge->DrawStringDecal({ int(screenWidth * 0.37f), int(screenHeight * 0.25f) }, "YOU BLEW A CRATER!");
 
 	pge->DrawStringDecal({ screenWidth * 0.33f, screenHeight * 0.8f }, "Press SPACE to restart!");
+}
+
+void Interface::FuelGauge(olc::PixelGameEngine* pge, Player* _Player)
+{
+	float size = ((_Player->fuel / 2250) * 20.0f);
+
+	pge->DrawDecal({ screenWidth * 0.32f, screenHeight * 0.952f }, decBar.get(), { size, 0.5f }, olc::GREY);
+	pge->DrawStringDecal({ screenWidth * 0.3f, screenHeight * 0.95f }, "F");
+	pge->DrawStringDecal({ screenWidth * 0.32f + 10.0f * size + 5.0f, screenHeight * 0.95f }, std::to_string((int)_Player->fuel) + "kg");
+}
+
+void Interface::Comms(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTime)
+{
+	static float   _time = 0.0f;
+	static float   randomTime = RandFloat(50.0f, 70.0f);
+	static bool    randomVariablesSet = false;
+	static bool    isMessageOnScreen = false;
+	static uint8_t randomControlQuestion;
+	static uint8_t randomCrewReponse;
+	static uint8_t randomCrewChatter;
+	static uint8_t randomLowAltWarning;
+	static uint8_t randomName;
+
+	if (!randomVariablesSet || _Player->dead)
+	{
+		randomControlQuestion = rand() % 5;
+		randomCrewReponse = rand() % 4;
+		randomCrewChatter = rand() % 3 + 4;
+		randomLowAltWarning = rand() % 3 + 7;
+		randomName = rand() % 3 + 10;
+		randomVariablesSet = true;
+	}
+
+	if (!paused)
+		_time += fElapsedTime;
+
+	// Allow messsages in ESC-pause, but not landed-pause
+	if (_Player->altitude > 0.7f)
+	{
+		if (_time > randomTime)
+		{
+			// Command message
+			if (_time < randomTime + 8.0f)
+				pge->DrawStringDecal(
+					{ screenWidth * 0.05f, screenHeight * 0.25f },
+					"Command:\n" + command[randomControlQuestion],
+					olc::GREY);
+
+			// Crew response
+			if (_time > randomTime + 3.0f && _time < randomTime + 8.0f)
+				pge->DrawStringDecal(
+					{ screenWidth * 0.05f, screenHeight * 0.3f },
+					"Eagle:\n" + crew[randomCrewReponse],
+					olc::GREY);
+
+			// Reset timers when done
+			if (_time > randomTime + 8.0f)
+			{
+				randomVariablesSet = false;
+				randomTime = RandFloat(50.0f, 70.0f);
+				_time = 0.0f;
+			}
+		}
+
+		// Crew chatter
+		if (_time > randomTime / 2 && _time < randomTime / 2 + 7.0f && _Player->altitude > 4.0f)
+			pge->DrawStringDecal(
+				{ screenWidth * 0.05f, screenHeight * 0.35f },
+				crew[randomName] + crew[randomCrewChatter],
+				olc::GREY);
+
+		// Low fuel
+		if (_Player->fuel < 500)
+		{
+			pge->DrawStringDecal(
+				{ screenWidth * 0.05f, screenHeight * 0.45f },
+				crew[10] + crew[13],
+				olc::GREY);
+		}
+
+		// Low alt
+		if (_Player->altitude < 4.0f && abs(_Player->currentSegmentAngle) <= 0.349f)
+			pge->DrawStringDecal(
+				{ screenWidth * 0.05f, screenHeight * 0.4f },
+				crew[randomName] + crew[randomLowAltWarning],
+				olc::GREY);
+		else
+			randomLowAltWarning = rand() % 3 + 7;
+	}
 }

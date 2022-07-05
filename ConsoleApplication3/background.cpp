@@ -5,6 +5,7 @@
 Background::Background()
 {
 	sprEarth = std::make_unique<olc::Sprite>("../gfx/earth.png");
+	decEarth = std::make_unique<olc::Decal>(sprEarth.get());
 	Reset();
 }
 
@@ -22,7 +23,7 @@ void Background::Draw(olc::PixelGameEngine* pge, Player* _Player)
 			pge->DrawCircle(star.position * scale + _Player->adjustedPosition, 1 * int(scale), olc::WHITE);
 	}
 
-	pge->DrawSprite(earthPos * scale + _Player->adjustedPosition, sprEarth.get(), int(scale * 2));
+	pge->DrawDecal(earthPos * scale + _Player->adjustedPosition, decEarth.get(), { scale * 2, scale * 2 });
 }
 
 void Background::Reset()

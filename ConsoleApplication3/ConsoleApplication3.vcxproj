@@ -163,6 +163,7 @@
     <ClInclude Include="terrain.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\gfx\bar.png" />
     <Image Include="..\gfx\burner.png" />
     <Image Include="..\gfx\earth.png" />
     <Image Include="..\gfx\end.png" />

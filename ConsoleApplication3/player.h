@@ -37,7 +37,6 @@ private:
 	std::unique_ptr<olc::Sprite> sprPlayerDestroyed;
 	std::unique_ptr<olc::Sprite> sprBurner;
 	std::unique_ptr<olc::Sprite> sprEnd;
-
 	std::unique_ptr<olc::Decal>  decPlayerLightDamage;
 	std::unique_ptr<olc::Decal>  decPlayerMediumDamage;
 	std::unique_ptr<olc::Decal>  decPlayerHeavyDamage;
@@ -49,12 +48,13 @@ public:
 	void LandingHandler(
 		olc::PixelGameEngine* pge,
 		sSegment& segment, 
-		Background* background, 
-		Terrain* terrain, 
-		Interface* userInterface,
-		FileHandler* fileHandler,
-		Audio* audio);
+		Background* _Background, 
+		Terrain* _Terrain,
+		Audio* _Audio,
+		float fElapsedTime);
 	void Draw(olc::PixelGameEngine* pge, float fElapsedTime);
-	void Physics(olc::PixelGameEngine* pge, Terrain* terrain, Audio* audio, float fElapsedTime);
+	void Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio, float fElapsedTime);
 	void Reset();
+private:
+	bool LandingSuccessful(sSegment& segment);
 };

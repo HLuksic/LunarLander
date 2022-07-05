@@ -89,7 +89,8 @@ void Terrain::Collision(
 	Background* _Background, 
 	Interface* _Interface, 
 	FileHandler* _FileHandler,
-	Audio* _Audio)
+	Audio* _Audio,
+	float fElapsedTime)
 {
 	for (auto& segment : deqSegments)
 	{
@@ -107,7 +108,7 @@ void Terrain::Collision(
 
 			if (_Player->altitude < 0.7f)
 			{
-				_Player->LandingHandler(pge, segment, _Background, this, _Interface, _FileHandler, _Audio);
+				_Player->LandingHandler(pge, segment, _Background, this, _Audio, fElapsedTime);
 				break;
 			}
 		}

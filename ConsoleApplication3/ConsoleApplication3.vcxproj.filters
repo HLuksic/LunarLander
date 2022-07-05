@@ -109,6 +109,9 @@
     <Image Include="..\gfx\landerMediumDamage.png">
       <Filter>Resource Files\Graphics</Filter>
     </Image>
+    <Image Include="..\gfx\bar.png">
+      <Filter>Resource Files\Graphics</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\sfx\engine.wav">

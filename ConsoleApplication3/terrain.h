@@ -30,7 +30,7 @@ private:
 	std::unique_ptr<olc::Decal>  decSurface;
 
 public:
-	void Collision(
+	void HandleCollision(
 		olc::PixelGameEngine* pge, 
 		Player* _Player, 
 		Background* _Background, 

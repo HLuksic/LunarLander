@@ -19,8 +19,8 @@ public:
 	std::unique_ptr<olc::Sprite> sprEarth;
 	std::unique_ptr<olc::Decal>	 decEarth;
 private:
-	olc::vf2d          earthPos;
 	std::vector<sStar> vecStars;
+	olc::vf2d          earthPos;
 
 public:
 	void Draw(olc::PixelGameEngine* pge, Player* _Player);

@@ -45,7 +45,7 @@ private:
 	std::unique_ptr<olc::Decal>  decEnd;
 
 public:
-	void LandingHandler(
+	void HandleLanding(
 		olc::PixelGameEngine* pge,
 		sSegment& segment, 
 		Background* _Background, 

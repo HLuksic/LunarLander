@@ -10,10 +10,10 @@ class Audio
 public:
 	Audio();
 
-private:
-	int soundSamples[13];
 public:
 	bool soundPlayed;
+private:
+	int soundSamples[13];
 
 public:
 	void Play(olc::PixelGameEngine* pge, Player* _Player);

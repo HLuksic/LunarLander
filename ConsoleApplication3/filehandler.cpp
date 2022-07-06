@@ -20,7 +20,7 @@ int FileHandler::ReadOrCreateFile()
 	return -1;
 }
 
-void FileHandler::OverwriteScore(int score)
+void FileHandler::OverwriteScore(uint32_t score)
 {
 	char* scoreString = new char[20];
 	_itoa_s(score, scoreString, 20, 10);

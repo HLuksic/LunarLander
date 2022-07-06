@@ -116,7 +116,7 @@ void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* _Background, 
 	}
 }
 
-void Interface::LandingMessages(olc::PixelGameEngine* pge, int totalVelocity, int gainedScore)
+void Interface::LandingMessages(olc::PixelGameEngine* pge, uint16_t totalVelocity, uint16_t gainedScore)
 {
 	switch (totalVelocity)
 	{
@@ -147,9 +147,9 @@ void Interface::LandingMessages(olc::PixelGameEngine* pge, int totalVelocity, in
 	pge->DrawStringDecal({ SCREEN_WIDTH * 0.43f, SCREEN_HEIGHT * 0.3f }, "+500 fuel", olc::DARK_GREY);
 }
 
-void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* _FileHandler, int totalVelocity, int currentScore)
+void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* _FileHandler, uint16_t totalVelocity, uint32_t currentScore)
 {
-	int highScore = _FileHandler->ReadOrCreateFile();
+	uint32_t highScore = _FileHandler->ReadOrCreateFile();
 
 	if (highScore == -1 || highScore < currentScore)
 		_FileHandler->OverwriteScore(currentScore);
@@ -226,15 +226,15 @@ void Interface::Comms(olc::PixelGameEngine* pge, Player* _Player, float fElapsed
 
 		// Crew chatter
 		if (_time > randomTime / 2 && _time < randomTime / 2 + 7.0f && _Player->altitude > 4.0f)
-			pge->DrawStringDecal({ SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.35f }, crew[randomName] + crew[randomCrewChatter], olc::GREY);
+			pge->DrawStringDecal({ SCREEN_WIDTH * 0.03f, SCREEN_HEIGHT * 0.35f }, crew[randomName] + crew[randomCrewChatter], olc::GREY, { 0.85f, 0.85f });
 
 		// Low fuel
 		if (_Player->fuel < 500)
-			pge->DrawStringDecal({ SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.45f }, crew[10] + crew[13], olc::GREY);
+			pge->DrawStringDecal({ SCREEN_WIDTH * 0.03f, SCREEN_HEIGHT * 0.45f }, crew[10] + crew[13], olc::GREY, { 0.85f, 0.85f });
 
 		// Low alt
 		if (_Player->altitude < 4.0f && abs(_Player->currentSegmentAngle) <= 0.349f)
-			pge->DrawStringDecal({ SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.4f }, crew[randomName] + crew[randomLowAltWarning], olc::GREY);
+			pge->DrawStringDecal({ SCREEN_WIDTH * 0.03f, SCREEN_HEIGHT * 0.4f }, crew[randomName] + crew[randomLowAltWarning], olc::GREY, { 0.85f, 0.85f });
 		else
 			randomLowAltWarning = rand() % 3 + 7;
 	}

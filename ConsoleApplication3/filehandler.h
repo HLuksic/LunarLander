@@ -7,9 +7,9 @@ class FileHandler
 {
 public:
 	std::fstream file;
-	std::string highScore;
+	std::string  highScore;
 
 public:
 	int ReadOrCreateFile();
-	void OverwriteScore(int score);
+	void OverwriteScore(uint32_t score);
 };

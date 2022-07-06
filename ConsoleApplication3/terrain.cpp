@@ -55,7 +55,7 @@ void Terrain::Spawn(Player* _Player)
 		CreateNewSegment(&deqBackgroundSegments, false, { 15.0f, 25.0f }, { -15.0f, 15.0f });
 }
 
-void Terrain::Collision(
+void Terrain::HandleCollision(
 	olc::PixelGameEngine* pge, 
 	Player* _Player, 
 	Background* _Background, 
@@ -80,7 +80,7 @@ void Terrain::Collision(
 
 			if (_Player->altitude < 0.7f)
 			{
-				_Player->LandingHandler(pge, segment, _Background, this, _Audio, fElapsedTime);
+				_Player->HandleLanding(pge, segment, _Background, this, _Audio, fElapsedTime);
 				break;
 			}
 		}

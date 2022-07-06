@@ -161,7 +161,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 	}
 }
 
-void Player::LandingHandler(
+void Player::HandleLanding(
 	olc::PixelGameEngine* pge, 
 	sSegment& segment, 
 	Background* _Background,

@@ -209,16 +209,16 @@ void Player::LandingHandler(
 
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
 		{
+			_Audio->soundPlayed = false;
+			_Audio->PlaySoundSample(pge, 1, 11);
+			_Audio->soundPlayed = false;
+
 			this->Reset();
 			_Background->Reset();
 			_Terrain->Reset();
 			adjustedPosition = position * 0.5f;
 			scale            = 0.5f;
 			paused           = false;
-			
-			_Audio->soundPlayed = false;
-			_Audio->PlaySoundSample(pge, 1, 11);
-			_Audio->soundPlayed = false;
 		}
 	}
 }
@@ -227,22 +227,20 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio
 {
 	static float Time = 0.0f;
 
-	if (fuel > 2250.0f)
-		fuel = 2250.0f;
-
-	// Divide by 3 for believable velocity, this is what's displayed
-	normHorVel = abs((int)(velocity.x / 3));
-	normVerVel   = abs((int)(velocity.y / 3));
-
 	if (!paused)
 	{
+		if (fuel > 2250.0f)
+			fuel = 2250.0f;
+
+		// Divide by 3 for believable velocity, this is what's displayed
+		normHorVel = abs((int)(velocity.x / 3));
+		normVerVel = abs((int)(velocity.y / 3));
+
 		// Angle reset if full circle
 		if (abs(angle) > 6.283f) angle = 0.0f;
 
 		// Directional velocity
-		velocity += {
-			thrust * cos(angle + PI * 0.5f) * fElapsedTime,
-			thrust * sin(angle + PI * 0.5f) * fElapsedTime };
+		velocity += { thrust * cos(angle + PI * 0.5f) * fElapsedTime, thrust * sin(angle + PI * 0.5f) * fElapsedTime };
 
 		// Gravity
 		velocity.y += 15.0f * fElapsedTime;
@@ -289,10 +287,10 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio
 
 	static bool lowFuelSoundPlayed;
 
-	if ((int)this->fuel > 500.0f)
+	if ((int)fuel > 500.0f)
 		lowFuelSoundPlayed = false;
 
-	if ((int)this->fuel < 500.0f && !lowFuelSoundPlayed)
+	if ((int)fuel < 500.0f && !lowFuelSoundPlayed)
 	{
 		_Audio->PlaySoundSample(pge, 1, 12);
 		_Audio->soundPlayed = false;
@@ -314,9 +312,9 @@ void Player::Reset()
 
 bool Player::LandingSuccessful(sSegment& segment)
 {
-	return (!segment.visited                        &&
-		    normHorVel <= 3       &&
-            normVerVel   <= 2       &&
-            abs(segment.angle)           <= 0.349f  &&  // 20 degrees
-            abs(angle - segment.angle)   <= 0.087f);    // 5 degrees
+	return (normHorVel                   <= 3      &&
+            normVerVel                   <= 2      &&
+            abs(segment.angle)           <= 0.349f && // 20 degrees
+            abs(angle - segment.angle)   <= 0.087f && // 5 degrees
+	        !segment.visited);
 }

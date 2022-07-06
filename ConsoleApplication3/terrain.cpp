@@ -40,7 +40,7 @@ void Terrain::Spawn(Player* _Player)
 	if (!deqSegments.size() && !deqBackgroundSegments.size())
 		SpawnInitialNodes(_Player);
 
-	// If the front or back segments' outer node (outermost point of terrain) 
+	// If the front or back segments' outer node (last point of terrain) 
 	// is on screen, spawn a new segment
 	if (deqSegments.back().leftNode.x > _Player->position.x - (float)SCREEN_WIDTH / (2 * scale))
 		CreateNewSegment(&deqSegments, true, { 30.0f, 50.0f }, { -50.0f, 50.0f });
@@ -92,6 +92,9 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTim
 	//pge->DrawString({ 30,30 }, std::to_string((int)deqSegments.size()));
 	//pge->DrawString({ 30,40 }, std::to_string((int)deqBackgroundSegments.size()));
 
+	// Yes, this approach slows down as the number of total segments increases,
+	// but I can't think of a reasonably simple way to mitigate this. 
+	// The performance impact isn't terrible anyway.
 	for (auto& segment : deqBackgroundSegments)
 	{
 		// Terrain moves inversely to player

@@ -90,7 +90,7 @@ int main()
 {
 	LunarLander _LunarLander;
 	
-	if (_LunarLander.Construct(550, 390, 2, 2, false, false))
+	if (_LunarLander.Construct(550, 390, 2, 2, false, true))
 		_LunarLander.Start();
 
 	return 0;

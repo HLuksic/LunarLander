@@ -13,6 +13,8 @@ class Interface
 public:
 	Interface();
 
+public:
+	bool titleScreen;
 private:
 	const std::string            command[5];
 	const std::string            crew[14];

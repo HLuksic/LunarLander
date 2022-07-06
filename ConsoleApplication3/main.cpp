@@ -10,21 +10,22 @@
 
 // TODO: 
 // FOREGROUND
+// TALKING SOUND
 
-class lunarLander : public olc::PixelGameEngine
+class LunarLander : public olc::PixelGameEngine
 {
 public:
-	lunarLander()
+	LunarLander()
 	{
 		sAppName = "Lunar lander";
 	}
 
 private:
-	Audio* _Audio;
-	Player* _Player;
-	Terrain* _Terrain;
-	Interface* _Interface;
-	Background* _Background;
+	Audio*       _Audio;
+	Player*      _Player;
+	Terrain*     _Terrain;
+	Interface*   _Interface;
+	Background*  _Background;
 	FileHandler* _FileHandler;
 
 public:
@@ -39,7 +40,6 @@ public:
 		_Background  = new Background;
 		_FileHandler = new FileHandler;
 		paused       = false;
-		titleScreen  = true;
 		scale        = 0.5f;
 
 		olc::SOUND::InitialiseAudio();
@@ -57,7 +57,7 @@ public:
 		if (GetKey(olc::SPACE).bPressed)
 			paused = false;
 
-		if (titleScreen)
+		if (_Interface->titleScreen)
 			_Interface->TitleScreen(this, _Background, _Player, _FileHandler, _Audio);
 		else
 		{
@@ -88,10 +88,10 @@ public:
 
 int main() 
 {
-	lunarLander game;
+	LunarLander _LunarLander;
 	
-	if (game.Construct(550, 390, 2, 2, false, true))
-		game.Start();
+	if (_LunarLander.Construct(550, 390, 2, 2, false, false))
+		_LunarLander.Start();
 
 	return 0;
 }

@@ -23,8 +23,8 @@ public:
 	bool	  dead;
 	uint16_t  gainedScore;
 	uint16_t  landings;
-	uint16_t  normalizedHorizontalVelocity;
-	uint16_t  normalizedVerticalVelocity;
+	uint16_t  normHorVel;
+	uint16_t  normVerVel;
 	olc::vf2d position;
 	olc::vf2d adjustedPosition;
 	olc::vf2d velocity;

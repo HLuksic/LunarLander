@@ -7,7 +7,7 @@
 
 Player::Player()
 {
-	position              = { playerX, playerY };
+	position              = { PLAYER_X, PLAYER_Y };
 	adjustedPosition      = position / 2;
 
 	sprPlayerLightDamage  = std::make_unique<olc::Sprite>("../gfx/landerLightDamage.png");
@@ -43,7 +43,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 	else
 	{
 		// Different levels of damage decals
-		if (normalizedHorizontalVelocity + normalizedVerticalVelocity < 7)
+		if (normHorVel + normVerVel < 7)
 			pge->DrawRotatedDecal(
 				position * scale + adjustedPosition,
 				decPlayerLightDamage.get(),
@@ -51,7 +51,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 				olc::vf2d(8.0f, 8.0f),
 				olc::vf2d(1.0f, 1.0f) * scale);
 
-		else if (normalizedHorizontalVelocity + normalizedVerticalVelocity < 10)
+		else if (normHorVel + normVerVel < 10)
 			pge->DrawRotatedDecal(
 				position * scale + adjustedPosition,
 				decPlayerMediumDamage.get(),
@@ -59,7 +59,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 				olc::vf2d(8.0f, 8.0f),
 				olc::vf2d(1.0f, 1.0f) * scale);
 
-		else if (normalizedHorizontalVelocity + normalizedVerticalVelocity < 13)
+		else if (normHorVel + normVerVel < 13)
 			pge->DrawRotatedDecal(
 				position * scale + adjustedPosition,
 				decPlayerHeavyDamage.get(),
@@ -67,7 +67,7 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 				olc::vf2d(8.0f, 8.0f),
 				olc::vf2d(1.0f, 1.0f) * scale);
 		
-		else if (normalizedHorizontalVelocity + normalizedVerticalVelocity > 12)
+		else if (normHorVel + normVerVel > 12)
 			pge->DrawRotatedDecal(
 				position * scale + adjustedPosition,
 				decPlayerDestroyed.get(),
@@ -176,7 +176,7 @@ void Player::LandingHandler(
 	// Successful landing
 	if (LandingSuccessful(segment))
 	{
-		gainedScore = int(50 + abs(segment.angle) * 544 * (5 - (normalizedHorizontalVelocity + normalizedVerticalVelocity)));
+		gainedScore = int(50 + abs(segment.angle) * 544 * (5 - (normHorVel + normVerVel)));
 		
 		_Audio->PlaySoundSample(pge, 3, 3);
 		
@@ -195,7 +195,7 @@ void Player::LandingHandler(
 			_Audio->soundPlayed = false;
 
 			// Launch player based on ground angle
-			this->velocity  = { -cos(angle + HALFPI) * 90.0f, -sin(angle + HALFPI) * 90.0f };
+			this->velocity  = { -cos(angle + HALF_PI) * 90.0f, -sin(angle + HALF_PI) * 90.0f };
 			paused          = false;
 			statsUpdated    = false;
 			segment.visited = true;
@@ -231,8 +231,8 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio
 		fuel = 2250.0f;
 
 	// Divide by 3 for believable velocity, this is what's displayed
-	normalizedHorizontalVelocity = abs((int)(velocity.x / 3));
-	normalizedVerticalVelocity   = abs((int)(velocity.y / 3));
+	normHorVel = abs((int)(velocity.x / 3));
+	normVerVel   = abs((int)(velocity.y / 3));
 
 	if (!paused)
 	{
@@ -303,7 +303,7 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio
 void Player::Reset()
 {
 	angle    = 0.0f;
-	position = { (float)screenWidth / 2, (float)screenHeight / 2 };
+	position = { (float)SCREEN_WIDTH / 2, (float)SCREEN_HEIGHT / 2 };
 	velocity = { 0.0f, 0.7f };
 	thrust   = 0.0f;
 	score    = 0;
@@ -315,8 +315,8 @@ void Player::Reset()
 bool Player::LandingSuccessful(sSegment& segment)
 {
 	return (!segment.visited                        &&
-		    normalizedHorizontalVelocity <= 3       &&
-            normalizedVerticalVelocity   <= 2       &&
+		    normHorVel <= 3       &&
+            normVerVel   <= 2       &&
             abs(segment.angle)           <= 0.349f  &&  // 20 degrees
             abs(angle - segment.angle)   <= 0.087f);    // 5 degrees
 }

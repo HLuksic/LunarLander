@@ -9,9 +9,7 @@
 #include "global.h"
 
 // TODO: 
-// FOREGROUND
 // COMMS SOUNDS
-// BACKGROUND COLOR SWITCH?
 
 class LunarLander : public olc::PixelGameEngine
 {
@@ -28,6 +26,17 @@ private:
 	Interface*   _Interface;
 	Background*  _Background;
 	FileHandler* _FileHandler;
+
+	/*const olc::Pixel backgroundColors[8] = {
+		{ olc::BLACK },
+		{ olc::VERY_DARK_BLUE },
+		{ olc::VERY_DARK_CYAN },
+		{ olc::VERY_DARK_GREEN },
+		{ olc::VERY_DARK_GREY },
+		{ olc::VERY_DARK_MAGENTA },
+		{ olc::VERY_DARK_RED },
+		{ olc::VERY_DARK_YELLOW },
+	};*/
 
 public:
 	bool OnUserCreate() override
@@ -50,7 +59,17 @@ public:
 
 	bool OnUserUpdate(float fElapsedTime) override
 	{
+		//static uint8_t index = 0;
+
 		Clear(olc::BLACK);
+
+		/*if (GetKey(olc::TAB).bPressed)
+		{
+			if (index < 7)
+				index++;
+			else
+				index = 0;
+		}*/
 
 		if (GetKey(olc::ESCAPE).bPressed)
 			paused = true;

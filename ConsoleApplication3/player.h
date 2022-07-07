@@ -56,5 +56,5 @@ public:
 	void Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio, float fElapsedTime);
 	void Reset();
 private:
-	bool LandingSuccessful(sSegment& segment);
+	bool LandingSuccessful(sSegment& segment, float segmentAngle);
 };

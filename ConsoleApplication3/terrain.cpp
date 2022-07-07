@@ -11,48 +11,41 @@ Terrain::Terrain()
 }
 
 template<typename T>
-void Terrain::CreateNewSegment(T _Terrain, bool left, olc::vf2d distanceX, olc::vf2d distanceY)
+void Terrain::CreateNewSegment(T terrain, bool left, olc::vf2d distanceX, olc::vf2d distanceY)
 {
 	// New rightNode is the previous back() segments leftNode
 	// New leftNode is random with regard to previous back() segments leftNode
-	if (left)
-	{
-		olc::vf2d newRightNode = _Terrain->back().leftNode;
-		olc::vf2d newLeftNode = {
-			_Terrain->back().leftNode.x - RandFloat(distanceX.x, distanceX.y),
-			_Terrain->back().leftNode.y + RandFloat(distanceY.x, distanceY.y) };
 
-		_Terrain->push_back({ GetGroundAngle(newLeftNode, newRightNode), false, newLeftNode, newRightNode });
-	}
-	else
-	{
-		olc::vf2d newLeftNode = _Terrain->front().rightNode;
-		olc::vf2d newRightNode = {
-			_Terrain->front().rightNode.x + RandFloat(distanceX.x, distanceX.y),
-			_Terrain->front().rightNode.y + RandFloat(distanceY.x, distanceY.y) };
+	olc::vf2d newLeftNode  = left ? olc::vf2d(terrain->back().leftNode.x - RandFloat(distanceX.x, distanceX.y),
+                                              terrain->back().leftNode.y + RandFloat(distanceY.x, distanceY.y)) : 
+                                    terrain->front().rightNode;
 
-		_Terrain->push_front({ GetGroundAngle(newLeftNode, newRightNode), false, newLeftNode, newRightNode });
-	}
+	olc::vf2d newRightNode = left ? terrain->back().leftNode :
+                                    olc::vf2d(terrain->front().rightNode.x + RandFloat(distanceX.x, distanceX.y),
+                                              terrain->front().rightNode.y + RandFloat(distanceY.x, distanceY.y));
+
+	left ? terrain->push_back( { false, newLeftNode, newRightNode }) :
+           terrain->push_front({ false, newLeftNode, newRightNode });
 }
 
 void Terrain::Spawn(Player* _Player)
 {
-	if (!deqSegments.size() && !deqBackgroundSegments.size())
+	if (!deqFgSegments.size() && !deqBgSegments.size())
 		SpawnInitialNodes(_Player);
 
 	// If the front or back segments' outer node (last point of terrain) 
 	// is on screen, spawn a new segment
-	if (deqSegments.back().leftNode.x > _Player->position.x - (float)SCREEN_WIDTH / (2 * scale))
-		CreateNewSegment(&deqSegments, true, { 30.0f, 50.0f }, { -50.0f, 50.0f });
+	if (deqFgSegments.back().leftNode.x > _Player->position.x - (float)SCREEN_WIDTH / (2 * scale))
+		CreateNewSegment(&deqFgSegments, true, { 30.0f, 50.0f }, { -50.0f, 50.0f });
 
-	if (deqSegments.front().rightNode.x < _Player->position.x + (float)SCREEN_WIDTH / (2 * scale))
-		CreateNewSegment(&deqSegments, false, { 30.0f, 50.0f }, { -50.0f, 50.0f });
+	if (deqFgSegments.front().rightNode.x < _Player->position.x + (float)SCREEN_WIDTH / (2 * scale))
+		CreateNewSegment(&deqFgSegments, false, { 30.0f, 50.0f }, { -50.0f, 50.0f });
 
-	if (deqBackgroundSegments.back().leftNode.x > _Player->position.x - (float)SCREEN_WIDTH / (2 * scale))
-		CreateNewSegment(&deqBackgroundSegments, true, { 15.0f, 25.0f }, { -15.0f, 15.0f });
+	if (deqBgSegments.back().leftNode.x > _Player->position.x - (float)SCREEN_WIDTH / (2 * scale))
+		CreateNewSegment(&deqBgSegments, true, { 15.0f, 25.0f }, { -15.0f, 15.0f });
 
-	if (deqBackgroundSegments.front().rightNode.x < _Player->position.x + (float)SCREEN_WIDTH / (2 * scale))
-		CreateNewSegment(&deqBackgroundSegments, false, { 15.0f, 25.0f }, { -15.0f, 15.0f });
+	if (deqBgSegments.front().rightNode.x < _Player->position.x + (float)SCREEN_WIDTH / (2 * scale))
+		CreateNewSegment(&deqBgSegments, false, { 15.0f, 25.0f }, { -15.0f, 15.0f });
 }
 
 void Terrain::HandleCollision(
@@ -64,13 +57,13 @@ void Terrain::HandleCollision(
 	Audio* _Audio,
 	float fElapsedTime)
 {
-	for (auto& segment : deqSegments)
+	for (auto& segment : deqFgSegments)
 	{
 		// Get segment directly under player
 		if (segment.leftNode.x < _Player->position.x && segment.rightNode.x > _Player->position.x)
 		{
 			// Calculate point directly under player
-			_Player->currentSegmentAngle = segment.angle;
+			_Player->currentSegmentAngle = GetGroundAngle(segment.leftNode, segment.rightNode);
 			float diffY = segment.rightNode.y - segment.leftNode.y;
 			float diffX = segment.rightNode.x - segment.leftNode.x;
 			float mult = (_Player->position.x - segment.leftNode.x) / diffX;
@@ -89,13 +82,10 @@ void Terrain::HandleCollision(
 
 void Terrain::Draw(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTime)
 {
-	//pge->DrawString({ 30,30 }, std::to_string((int)deqSegments.size()));
-	//pge->DrawString({ 30,40 }, std::to_string((int)deqBackgroundSegments.size()));
-
 	// Yes, this approach slows down as the number of total segments increases,
 	// but I can't think of a reasonably simple way to mitigate this. 
 	// The performance impact isn't terrible anyway.
-	for (auto& segment : deqBackgroundSegments)
+	for (auto& segment : deqBgSegments)
 	{
 		// Terrain moves inversely to player
 		if (!paused)
@@ -118,7 +108,7 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTim
 				olc::VERY_DARK_GREY);
 	}
 
-	for (auto& segment : deqSegments)
+	for (auto& segment : deqFgSegments)
 	{
 		if (!paused)
 		{
@@ -130,7 +120,7 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTim
 			segment.rightNode.x > _Player->position.x - (float)SCREEN_WIDTH / (2 * scale))
 		{
 			// Landable segments are WHITE, non-landable are DARK_GREY
-			if (abs(segment.angle) <= 0.349f && !segment.visited)
+			if (abs(GetGroundAngle(segment.leftNode, segment.rightNode)) <= 0.349f && !segment.visited)
 				pge->DrawWarpedDecal(
 					decSurface.get(),
 					{
@@ -156,22 +146,19 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTim
 
 void Terrain::Reset()
 {
-	deqSegments.clear();
-	deqBackgroundSegments.clear();
+	deqFgSegments.clear();
+	deqBgSegments.clear();
 }
 
 void Terrain::SpawnInitialNodes(Player* _Player)
 {
-	olc::vf2d node1 = { _Player->position.x - 20.0f, RandFloat(SCREEN_HEIGHT * 1.3f, SCREEN_HEIGHT * 1.6f) };
-	olc::vf2d node2 = { _Player->position.x + 20.0f, RandFloat(SCREEN_HEIGHT * 1.3f, SCREEN_HEIGHT * 1.6f) };
+	deqFgSegments.push_back({ false, 
+		{ _Player->position.x - 20.0f, RandFloat(SCREEN_HEIGHT * 1.4f, SCREEN_HEIGHT * 1.5f) },
+		{ _Player->position.x + 20.0f, RandFloat(SCREEN_HEIGHT * 1.4f, SCREEN_HEIGHT * 1.5f) } });
 
-	deqSegments.push_back({ GetGroundAngle(node1, node2), false, node1, node2 });
-
-	deqBackgroundSegments.push_back({
-		0.0f,
-		false,
-		{ _Player->position.x - 7.0f, RandFloat(SCREEN_HEIGHT * 0.9f, SCREEN_HEIGHT * 1.0f) },
-		{ _Player->position.x + 7.0f, RandFloat(SCREEN_HEIGHT * 0.9f, SCREEN_HEIGHT * 1.0f) } });
+	deqBgSegments.push_back({ false,
+		{ _Player->position.x - 7.0f, RandFloat(SCREEN_HEIGHT * 0.95f, SCREEN_HEIGHT * 1.0f) },
+		{ _Player->position.x + 7.0f, RandFloat(SCREEN_HEIGHT * 0.95f, SCREEN_HEIGHT * 1.0f) } });
 }
 
 float Terrain::GetGroundAngle(olc::vf2d node1, olc::vf2d node2)

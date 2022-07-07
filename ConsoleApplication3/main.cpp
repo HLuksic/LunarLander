@@ -11,7 +11,6 @@
 // TODO: 
 // FOREGROUND
 // COMMS SOUNDS
-// ADD FUEL AND SCORE INCREMENTALLY
 // BACKGROUND COLOR SWITCH?
 
 class LunarLander : public olc::PixelGameEngine

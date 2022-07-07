@@ -4,7 +4,6 @@
 #include "background.h"
 #include "filehandler.h"
 
-
 Interface::Interface() :
 	command
 	{
@@ -171,10 +170,12 @@ void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* _FileHandl
 void Interface::FuelGauge(olc::PixelGameEngine* pge, Player* _Player)
 {
 	float size = ((_Player->fuel / 2250) * 20.0f);
+	float pos = SCREEN_WIDTH * 0.32f + 10.0f * size + 5.0f;
 
-	pge->DrawDecal(      { SCREEN_WIDTH * 0.32f, SCREEN_HEIGHT * 0.952f }, decBar.get(), { size, 0.5f }, olc::GREY);
-	pge->DrawStringDecal({ SCREEN_WIDTH * 0.3f,  SCREEN_HEIGHT * 0.95f }, "F");
-	pge->DrawStringDecal({ SCREEN_WIDTH * 0.32f + 10.0f * size + 5.0f, SCREEN_HEIGHT * 0.95f }, std::to_string((int)_Player->fuel) + "kg");
+	pge->DrawDecal(      { SCREEN_WIDTH * 0.317f, SCREEN_HEIGHT * 0.948f }, decBar.get(), { 20.3f, 0.9f }, olc::VERY_DARK_GREY);
+	pge->DrawDecal(      { SCREEN_WIDTH * 0.32f,  SCREEN_HEIGHT * 0.952f }, decBar.get(), { size, 0.5f }, olc::GREY);
+	pge->DrawStringDecal({ SCREEN_WIDTH * 0.3f,   SCREEN_HEIGHT * 0.95f  }, "F", olc::GREY);
+	pge->DrawStringDecal({ pos,                   SCREEN_HEIGHT * 0.95f  }, std::to_string((int)_Player->fuel) + "kg", olc::GREY);
 }
 
 void Interface::Comms(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTime)

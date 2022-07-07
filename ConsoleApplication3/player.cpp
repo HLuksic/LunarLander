@@ -170,7 +170,7 @@ void Player::HandleLanding(
 	float fElapsedTime)
 {
 	static bool statsUpdated = false;
-
+	
 	paused = true;
 	
 	// Successful landing
@@ -180,12 +180,19 @@ void Player::HandleLanding(
 		
 		_Audio->PlaySoundSample(pge, 3, 3);
 		
+		// This is slightly innacurate sometimes, but I don't care
 		if (!statsUpdated)
 		{
-			score       += gainedScore;
-			fuel        += 500;
-			landings    += 1;
-			statsUpdated = true;
+			static double t = 1.0;
+			t              -= fElapsedTime;
+			score          += gainedScore * fElapsedTime;
+			fuel           += 500.0f * fElapsedTime;
+
+			if (t <= 0.0)
+			{
+				t = 1.0;
+				statsUpdated = true;
+			}
 		}
 
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
@@ -199,6 +206,7 @@ void Player::HandleLanding(
 			paused          = false;
 			statsUpdated    = false;
 			segment.visited = true;
+			landings++;
 		}
 	}
 	else
@@ -225,12 +233,11 @@ void Player::HandleLanding(
 
 void Player::Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio, float fElapsedTime)
 {
-	static float Time = 0.0f;
+	if (fuel > 2250.0f)
+		fuel = 2250.0f;
 
 	if (!paused)
 	{
-		if (fuel > 2250.0f)
-			fuel = 2250.0f;
 
 		// Divide by 3 for believable velocity, this is what's displayed
 		normHorVel = abs((int)(velocity.x / 3));
@@ -244,9 +251,6 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio
 
 		// Gravity
 		velocity.y += 15.0f * fElapsedTime;
-
-		// +1 score per second, score has to be float for this to work
-		score += fElapsedTime;
 
 		if (pge->GetKey(olc::Key::W).bHeld && (int)fuel)
 		{

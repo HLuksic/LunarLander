@@ -1,5 +1,4 @@
 #include <fstream>
-#include <iostream>
 #include <string>
 #include "filehandler.h"
 
@@ -7,13 +6,15 @@ int FileHandler::ReadOrCreateFile()
 {
 	file.open("highscore.txt", std::ios::in);
 
-	if (file) {
+	if (file) 
+	{
 		std::getline(file, highScore);
 		file.close();
 		file.clear();
 
 		return std::atoi(highScore.c_str());
 	}
+
 	file.close();
 	file.clear();
 
@@ -22,11 +23,8 @@ int FileHandler::ReadOrCreateFile()
 
 void FileHandler::OverwriteScore(uint32_t score)
 {
-	char* scoreString = new char[20];
-	_itoa_s(score, scoreString, 20, 10);
-
 	file.open("highscore.txt", std::ios::out | std::ios::trunc);
-	file << scoreString;
+	file << std::to_string(score);
 
 	file.close();
 	file.clear();

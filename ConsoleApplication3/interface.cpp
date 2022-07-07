@@ -55,11 +55,11 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* _Player, FileHandler* _F
 
 	const std::vector<std::pair<olc::vf2d, std::string>> ui = 
 	{
-		{ _Player->position * scale + _Player->adjustedPosition,   std::to_string((int)_Player->altitude) + "m" }, 
-		{ {SCREEN_WIDTH * 0.03f, SCREEN_HEIGHT * 0.03f}, "H.V. " + std::to_string(_Player->normHorVel) + "m/s" },
-		{ {SCREEN_WIDTH * 0.03f, SCREEN_HEIGHT * 0.05f}, "V.V. " + std::to_string(_Player->normVerVel) + "m/s" },
-		{ {SCREEN_WIDTH * 0.88f, SCREEN_HEIGHT * 0.03f}, "S "    + std::to_string((int)_Player->score)},
-		{ {SCREEN_WIDTH * 0.88f, SCREEN_HEIGHT * 0.05f}, "L "    + std::to_string(_Player->landings) }
+		{ _Player->position * scale + _Player->adjustedPosition,    std::to_string((int)_Player->altitude) + "m" }, 
+		{ {SCREEN_WIDTH * 0.03f, SCREEN_HEIGHT * 0.030f}, "H.V. " + std::to_string(_Player->normHorVel) + "m/s" },
+		{ {SCREEN_WIDTH * 0.03f, SCREEN_HEIGHT * 0.055f}, "V.V. " + std::to_string(_Player->normVerVel) + "m/s" },
+		{ {SCREEN_WIDTH * 0.88f, SCREEN_HEIGHT * 0.030f}, "S "    + std::to_string((int)_Player->score)},
+		{ {SCREEN_WIDTH * 0.88f, SCREEN_HEIGHT * 0.055f}, "L "    + std::to_string(_Player->landings) }
 	};
 
 	for (auto& line : ui)
@@ -82,12 +82,13 @@ void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* _Background, 
 {
 	const std::vector<std::pair<olc::vf2d, std::string>> ui = 
 	{
-		{ { SCREEN_WIDTH * 0.25f, SCREEN_HEIGHT * 0.3f  },  "LUNAR LANDER" },
-		{ { SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.05f }, "   CONTROLS" },
-		{ { SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.07f }, "W,A,D - Thrusters" },
-		{ { SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.09f }, "SHIFT - Zoom" },
-		{ { SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.11f }, "ESC   - Pause" },
-		{ { SCREEN_WIDTH * 0.35f, SCREEN_HEIGHT * 0.8f  }, "Press SPACE to start!" }
+		{ { SCREEN_WIDTH * 0.25f, SCREEN_HEIGHT * 0.300f },  "LUNAR LANDER" },
+		{ { SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.050f }, "   CONTROLS" },
+		{ { SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.075f }, "W,A,D - Thrusters" },
+		{ { SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.100f }, "SHIFT - Zoom" },
+		{ { SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.125f }, "ESC   - Pause" },
+		{ { SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.150f }, "TAB   - Cycle Colors" },
+		{ { SCREEN_WIDTH * 0.35f, SCREEN_HEIGHT * 0.800f }, "Press SPACE to start!" }
 	};
 
 	for (auto& line : ui)
@@ -95,7 +96,7 @@ void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* _Background, 
 		if (line != ui.front())
 			pge->DrawStringDecal(line.first, line.second, olc::GREY);
 		else
-			pge->DrawStringDecal(line.first, line.second, olc::GREY, { 3.0f, 3.0f });
+			pge->DrawStringDecal(line.first, line.second, olc::WHITE, { 3.0f, 3.0f });
 	}
 
 	int highScore = _FileHandler->ReadOrCreateFile();
@@ -143,7 +144,7 @@ void Interface::LandingMessages(olc::PixelGameEngine* pge, uint16_t totalVelocit
 
 	pge->DrawStringDecal({ SCREEN_WIDTH * 0.47f, SCREEN_HEIGHT * 0.2f }, "+" + std::to_string(gainedScore));
 	pge->DrawStringDecal({ SCREEN_WIDTH * 0.33f, SCREEN_HEIGHT * 0.8f }, "Press SPACE to continue!");
-	pge->DrawStringDecal({ SCREEN_WIDTH * 0.43f, SCREEN_HEIGHT * 0.3f }, "+500 fuel", olc::DARK_GREY);
+	pge->DrawStringDecal({ SCREEN_WIDTH * 0.43f, SCREEN_HEIGHT * 0.3f }, "+500 fuel", olc::GREY);
 }
 
 void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* _FileHandler, uint16_t totalVelocity, uint32_t currentScore)
@@ -169,13 +170,13 @@ void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* _FileHandl
 
 void Interface::FuelGauge(olc::PixelGameEngine* pge, Player* _Player)
 {
-	float size = ((_Player->fuel / 2250) * 20.0f);
-	float pos = SCREEN_WIDTH * 0.32f + 10.0f * size + 5.0f;
+	float size      = ((_Player->fuel / 2250) * 20.0f);
+	float position  = SCREEN_WIDTH * 0.32f + 10.0f * size + 5.0f;
 
 	pge->DrawDecal(      { SCREEN_WIDTH * 0.317f, SCREEN_HEIGHT * 0.948f }, decBar.get(), { 20.3f, 0.9f }, olc::VERY_DARK_GREY);
-	pge->DrawDecal(      { SCREEN_WIDTH * 0.32f,  SCREEN_HEIGHT * 0.952f }, decBar.get(), { size, 0.5f }, olc::GREY);
-	pge->DrawStringDecal({ SCREEN_WIDTH * 0.3f,   SCREEN_HEIGHT * 0.95f  }, "F", olc::GREY);
-	pge->DrawStringDecal({ pos,                   SCREEN_HEIGHT * 0.95f  }, std::to_string((int)_Player->fuel) + "kg", olc::GREY);
+	pge->DrawDecal(      { SCREEN_WIDTH * 0.320f, SCREEN_HEIGHT * 0.952f }, decBar.get(), { size, 0.5f }, olc::GREY);
+	pge->DrawStringDecal({ SCREEN_WIDTH * 0.300f, SCREEN_HEIGHT * 0.950f }, "F", olc::GREY);
+	pge->DrawStringDecal({ position,              SCREEN_HEIGHT * 0.950f }, std::to_string((int)_Player->fuel) + "kg", olc::GREY);
 }
 
 void Interface::Comms(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTime)

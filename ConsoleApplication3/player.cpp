@@ -169,14 +169,14 @@ void Player::HandleLanding(
 	Audio* _Audio,
 	float fElapsedTime)
 {
+	float segmentAngle       = _Terrain->GetGroundAngle(segment.leftNode, segment.rightNode);
 	static bool statsUpdated = false;
-	
-	paused = true;
+    paused                   = true;
 	
 	// Successful landing
-	if (LandingSuccessful(segment))
+	if (LandingSuccessful(segment, segmentAngle))
 	{
-		gainedScore = int(50 + abs(segment.angle) * 544 * (5 - (normHorVel + normVerVel)));
+		gainedScore = int(50 + abs(segmentAngle) * 544 * (5 - (normHorVel + normVerVel)));
 		
 		_Audio->PlaySoundSample(pge, 3, 3);
 		
@@ -314,11 +314,11 @@ void Player::Reset()
 	dead     = false;
 }
 
-bool Player::LandingSuccessful(sSegment& segment)
+bool Player::LandingSuccessful(sSegment& segment, float segmentAngle)
 {
-	return (normHorVel                   <= 3      &&
-            normVerVel                   <= 2      &&
-            abs(segment.angle)           <= 0.349f && // 20 degrees
-            abs(angle - segment.angle)   <= 0.087f && // 5 degrees
+	return (normHorVel                <= 3      &&
+            normVerVel                <= 2      &&
+            abs(angle)                <= 0.349f && // 20 degrees
+            abs(angle - segmentAngle) <= 0.087f && // 5 degrees
 	        !segment.visited);
 }

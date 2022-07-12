@@ -161,13 +161,8 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 	}
 }
 
-void Player::HandleLanding(
-	olc::PixelGameEngine* pge, 
-	sSegment& segment, 
-	Background* _Background,
-	Terrain* _Terrain,
-	Audio* _Audio,
-	float fElapsedTime)
+void Player::HandleLanding(olc::PixelGameEngine* pge, sSegment& segment, 
+	Background* _Background, Terrain* _Terrain, Audio* _Audio, float fElapsedTime)
 {
 	float segmentAngle       = _Terrain->GetGroundAngle(segment.leftNode, segment.rightNode);
 	static bool statsUpdated = false;
@@ -316,8 +311,8 @@ void Player::Reset()
 bool Player::LandingSuccessful(sSegment& segment, float segmentAngle)
 {
 	return (normHorVel                <= 3      &&
-		    normVerVel                <= 2      &&
-		    abs(angle)                <= 0.349f && // 20 degrees
-		    abs(angle - segmentAngle) <= 0.087f && // 5 degrees
-		    !segment.visited);
+	        normVerVel                <= 2      &&
+	        abs(angle)                <= 0.349f && // 20 degrees
+	        abs(angle - segmentAngle) <= 0.087f && // 5 degrees
+	        !segment.visited);
 }

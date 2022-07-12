@@ -53,7 +53,7 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* _Player, FileHandler* _F
 	if (Paused && (int)_Player->altitude)
 		pge->DrawStringDecal({ int(SCREEN_WIDTH * 0.33f), int(SCREEN_HEIGHT * 0.7f) }, "         PAUSED\n\nPress SPACE to continue!");
 
-	const std::vector<std::pair<olc::vf2d, std::string>> ui = 
+	static const std::vector<std::pair<olc::vf2d, std::string>> ui = 
 	{
 		{ _Player->position * Scale + _Player->adjustedPosition,    std::to_string((int)_Player->altitude) + "m" }, 
 		{ {SCREEN_WIDTH * 0.03f, SCREEN_HEIGHT * 0.030f}, "H.V. " + std::to_string(_Player->normHorVel) + "m/s" },
@@ -80,7 +80,7 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* _Player, FileHandler* _F
 
 void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* _Background, Player* _Player, FileHandler* _FileHandler, Audio* _Audio)
 {
-	const std::vector<std::pair<olc::vf2d, std::string>> ui = 
+	static const std::vector<std::pair<olc::vf2d, std::string>> ui = 
 	{
 		{ { SCREEN_WIDTH * 0.25f, SCREEN_HEIGHT * 0.300f },  "LUNAR LANDER" },
 		{ { SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.050f }, "   CONTROLS" },

@@ -29,14 +29,8 @@ private:
 	std::unique_ptr<olc::Decal>  decSurface;
 
 public:
-	void HandleCollision(
-		olc::PixelGameEngine* pge, 
-		Player* _Player, 
-		Background* _Background, 
-		Interface* _Interface, 
-		FileHandler* _FileHandler,
-		Audio* _Audio,
-		float fElapsedTime);
+	void HandleCollision(olc::PixelGameEngine* pge, Player* _Player, Background* _Background, 
+		Interface* _Interface, FileHandler* _FileHandler, Audio* _Audio, float fElapsedTime);
 	void Spawn(Player* _Player);
 	void Draw(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTime);
 	void Reset();

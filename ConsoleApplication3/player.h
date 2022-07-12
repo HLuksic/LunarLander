@@ -45,13 +45,8 @@ private:
 	std::unique_ptr<olc::Decal>  decEnd;
 
 public:
-	void HandleLanding(
-		olc::PixelGameEngine* pge,
-		sSegment& segment, 
-		Background* _Background, 
-		Terrain* _Terrain,
-		Audio* _Audio,
-		float fElapsedTime);
+	void HandleLanding(olc::PixelGameEngine* pge, sSegment& segment, Background* _Background, 
+		Terrain* _Terrain, Audio* _Audio, float fElapsedTime);
 	void Draw(olc::PixelGameEngine* pge, float fElapsedTime);
 	void Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio, float fElapsedTime);
 	void Reset();

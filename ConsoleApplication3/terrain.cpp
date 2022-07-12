@@ -48,14 +48,8 @@ void Terrain::Spawn(Player* _Player)
 		CreateNewSegment(&deqBgSegments, false, { 15.0f, 25.0f }, { -15.0f, 15.0f });
 }
 
-void Terrain::HandleCollision(
-	olc::PixelGameEngine* pge, 
-	Player* _Player, 
-	Background* _Background, 
-	Interface* _Interface, 
-	FileHandler* _FileHandler,
-	Audio* _Audio,
-	float fElapsedTime)
+void Terrain::HandleCollision(olc::PixelGameEngine* pge, Player* _Player, Background* _Background, 
+	Interface* _Interface, FileHandler* _FileHandler, Audio* _Audio, float fElapsedTime)
 {
 	for (auto& segment : deqFgSegments)
 	{
@@ -100,10 +94,10 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTim
 			pge->DrawWarpedDecal(
 				decSurface.get(),
 				{ 
-					segment.leftNode * Scale  + _Player->adjustedPosition,
+					segment.leftNode  * Scale + _Player->adjustedPosition,
 					segment.rightNode * Scale + _Player->adjustedPosition,
 					olc::vf2d(segment.rightNode.x, segment.rightNode.y + 300.0f) * Scale + _Player->adjustedPosition,
-					olc::vf2d(segment.leftNode.x,  segment.leftNode.y + 300.0f) * Scale + _Player->adjustedPosition 
+					olc::vf2d(segment.leftNode.x,  segment.leftNode.y  + 300.0f) * Scale + _Player->adjustedPosition 
 				},
 				olc::VERY_DARK_GREY);
 	}
@@ -127,7 +121,7 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTim
 						segment.leftNode  * Scale + _Player->adjustedPosition,
 						segment.rightNode * Scale + _Player->adjustedPosition,
 						olc::vf2d(segment.rightNode.x, segment.rightNode.y + 500.0f) * Scale + _Player->adjustedPosition,
-						olc::vf2d(segment.leftNode.x,  segment.leftNode.y + 500.0f) * Scale + _Player->adjustedPosition
+						olc::vf2d(segment.leftNode.x,  segment.leftNode.y  + 500.0f) * Scale + _Player->adjustedPosition
 					},
 					olc::WHITE);
 			else
@@ -137,7 +131,7 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTim
 						segment.leftNode  * Scale + _Player->adjustedPosition,
 						segment.rightNode * Scale + _Player->adjustedPosition,
 						olc::vf2d(segment.rightNode.x, segment.rightNode.y + 500.0f) * Scale + _Player->adjustedPosition,
-						olc::vf2d(segment.leftNode.x,  segment.leftNode.y + 500.0f) * Scale + _Player->adjustedPosition
+						olc::vf2d(segment.leftNode.x,  segment.leftNode.y  + 500.0f) * Scale + _Player->adjustedPosition
 					},
 					olc::DARK_GREY);
 		}
@@ -152,11 +146,13 @@ void Terrain::Reset()
 
 void Terrain::SpawnInitialNodes(Player* _Player)
 {
-	deqFgSegments.push_back({ false, 
+	deqFgSegments.push_back({ 
+		false, 
 		{ _Player->position.x - 20.0f, RandFloat(SCREEN_HEIGHT * 1.4f, SCREEN_HEIGHT * 1.5f) },
 		{ _Player->position.x + 20.0f, RandFloat(SCREEN_HEIGHT * 1.4f, SCREEN_HEIGHT * 1.5f) } });
 
-	deqBgSegments.push_back({ false,
+	deqBgSegments.push_back({ 
+		false,
 		{ _Player->position.x - 7.0f, RandFloat(SCREEN_HEIGHT * 0.95f, SCREEN_HEIGHT * 1.0f) },
 		{ _Player->position.x + 7.0f, RandFloat(SCREEN_HEIGHT * 0.95f, SCREEN_HEIGHT * 1.0f) } });
 }

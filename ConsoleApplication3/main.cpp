@@ -49,8 +49,6 @@ public:
 		_Interface   = new Interface;
 		_Background  = new Background;
 		_FileHandler = new FileHandler;
-		Paused       = false;
-		Scale        = 0.5f;
 
 		olc::SOUND::InitialiseAudio();
 

@@ -14,16 +14,16 @@ void Background::Draw(olc::PixelGameEngine* pge, Player* _Player)
 	for (auto& star : vecStars)
 	{
 		if (star.lightIntensity < 0.25)
-			pge->DrawCircle(star.position * scale + _Player->adjustedPosition, 1 * int(scale), olc::VERY_DARK_GREY);
+			pge->DrawCircle(star.position * Scale + _Player->adjustedPosition, 1 * int(Scale), olc::VERY_DARK_GREY);
 		else if (star.lightIntensity < 0.5)
-			pge->DrawCircle(star.position * scale + _Player->adjustedPosition, 1 * int(scale), olc::DARK_GREY);
+			pge->DrawCircle(star.position * Scale + _Player->adjustedPosition, 1 * int(Scale), olc::DARK_GREY);
 		else if (star.lightIntensity < 0.75)
-			pge->DrawCircle(star.position * scale + _Player->adjustedPosition, 1 * int(scale), olc::GREY);
+			pge->DrawCircle(star.position * Scale + _Player->adjustedPosition, 1 * int(Scale), olc::GREY);
 		else
-			pge->DrawCircle(star.position * scale + _Player->adjustedPosition, 1 * int(scale), olc::WHITE);
+			pge->DrawCircle(star.position * Scale + _Player->adjustedPosition, 1 * int(Scale), olc::WHITE);
 	}
 
-	pge->DrawDecal(earthPos * scale + _Player->adjustedPosition, decEarth.get(), { scale * 2, scale * 2 });
+	pge->DrawDecal(earthPos * Scale + _Player->adjustedPosition, decEarth.get(), { Scale * 2, Scale * 2 });
 }
 
 void Background::Reset()

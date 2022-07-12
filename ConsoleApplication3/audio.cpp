@@ -22,10 +22,10 @@ Audio::Audio()
 
 void Audio::Play(olc::PixelGameEngine* pge, Player* _Player)
 {
-	if (pge->GetKey(olc::Key::W).bPressed && !_Player->dead && _Player->fuel >= 1.0f && !paused)
+	if (pge->GetKey(olc::Key::W).bPressed && !_Player->dead && _Player->fuel >= 1.0f && !Paused)
 		olc::SOUND::PlaySample(soundSamples[0], true);
 
-	if ((pge->GetKey(olc::Key::A).bPressed || pge->GetKey(olc::Key::D).bPressed) && !_Player->dead && _Player->fuel >= 1.0f && !paused)
+	if ((pge->GetKey(olc::Key::A).bPressed || pge->GetKey(olc::Key::D).bPressed) && !_Player->dead && _Player->fuel >= 1.0f && !Paused)
 		olc::SOUND::PlaySample(soundSamples[1], true);
 	
 	if (pge->GetKey(olc::Key::W).bReleased)

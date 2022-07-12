@@ -35,48 +35,48 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 
 	if (!dead)
 		pge->DrawRotatedDecal(
-			position * scale + adjustedPosition,
+			position * Scale + adjustedPosition,
 			decPlayer.get(),
 			angle,
 			olc::vf2d(8.0f, 8.0f),
-			olc::vf2d(1.0f, 1.0f) * scale);
+			olc::vf2d(1.0f, 1.0f) * Scale);
 	else
 	{
 		// Different levels of damage decals
 		if (normHorVel + normVerVel < 7)
 			pge->DrawRotatedDecal(
-				position * scale + adjustedPosition,
+				position * Scale + adjustedPosition,
 				decPlayerLightDamage.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
-				olc::vf2d(1.0f, 1.0f) * scale);
+				olc::vf2d(1.0f, 1.0f) * Scale);
 
 		else if (normHorVel + normVerVel < 10)
 			pge->DrawRotatedDecal(
-				position * scale + adjustedPosition,
+				position * Scale + adjustedPosition,
 				decPlayerMediumDamage.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
-				olc::vf2d(1.0f, 1.0f) * scale);
+				olc::vf2d(1.0f, 1.0f) * Scale);
 
 		else if (normHorVel + normVerVel < 13)
 			pge->DrawRotatedDecal(
-				position * scale + adjustedPosition,
+				position * Scale + adjustedPosition,
 				decPlayerHeavyDamage.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
-				olc::vf2d(1.0f, 1.0f) * scale);
+				olc::vf2d(1.0f, 1.0f) * Scale);
 		
 		else if (normHorVel + normVerVel > 12)
 			pge->DrawRotatedDecal(
-				position * scale + adjustedPosition,
+				position * Scale + adjustedPosition,
 				decPlayerDestroyed.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
-				olc::vf2d(1.0f, 1.0f) * scale);
+				olc::vf2d(1.0f, 1.0f) * Scale);
 	}
 
-	if ((int)fuel && !paused)
+	if ((int)fuel && !Paused)
 	{
 		if (pge->GetKey(olc::Key::W).bHeld)
 		{
@@ -87,22 +87,22 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 
 			// Using sin() and time here for burner growth effect
 			pge->DrawRotatedDecal(
-				position * scale + adjustedPosition,
+				position * Scale + adjustedPosition,
 				decBurner.get(),
 				angle,
 				{ 8.0f, -8.0f },
-				olc::vf2d(0.8f + abs(sin(mainBurnerTime)) * 0.5f, 0.8f + abs(sin(mainBurnerTime)) * 0.5f) * scale);
+				olc::vf2d(0.8f + abs(sin(mainBurnerTime)) * 0.5f, 0.8f + abs(sin(mainBurnerTime)) * 0.5f) * Scale);
 		}
 		else
 		{
 			// Short burnoff effect
 			if (mainBurnerTime > 0.0f)
 				pge->DrawRotatedDecal(
-					position * scale + adjustedPosition,
+					position * Scale + adjustedPosition,
 					decEnd.get(),
 					angle,
 					olc::vf2d(8.0f, -5.0f),
-					olc::vf2d(2.0f + abs(sin(mainBurnerTime) * 3.0f), 1.5f) * scale);
+					olc::vf2d(2.0f + abs(sin(mainBurnerTime) * 3.0f), 1.5f) * Scale);
 
 			mainBurnerTime -= fElapsedTime * 10;
 
@@ -114,11 +114,11 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 		if (pge->GetKey(olc::Key::A).bHeld)
 		{
 			pge->DrawRotatedDecal(
-				position * scale + adjustedPosition,
+				position * Scale + adjustedPosition,
 				decBurner.get(),
 				angle + 0.5f * PI,
 				olc::vf2d(-25.0f, -15.0f),
-				olc::vf2d(0.2f, 0.5f) * scale);
+				olc::vf2d(0.2f, 0.5f) * Scale);
 
 			sideBurnerTime = 0.3f;
 		}
@@ -126,11 +126,11 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 			if (sideBurnerTime > 0.0f)
 			{
 				pge->DrawRotatedDecal(
-					position * scale + adjustedPosition,
+					position * Scale + adjustedPosition,
 					decBurner.get(),
 					angle - 0.5f * PI,
 					olc::vf2d(41.0f, -15.0f),
-					olc::vf2d(0.2f, 0.5f) * scale);
+					olc::vf2d(0.2f, 0.5f) * Scale);
 
 				sideBurnerTime -= fElapsedTime;
 			}
@@ -138,11 +138,11 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 		if (pge->GetKey(olc::Key::D).bHeld)
 		{
 			pge->DrawRotatedDecal(
-				position * scale + adjustedPosition,
+				position * Scale + adjustedPosition,
 				decBurner.get(),
 				angle - 0.5f * PI,
 				olc::vf2d(41.0f, -15.0f),
-				olc::vf2d(0.2f, 0.5f) * scale);
+				olc::vf2d(0.2f, 0.5f) * Scale);
 
 			sideBurnerTime = 0.3f;
 		}
@@ -150,11 +150,11 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 			if (sideBurnerTime > 0.0f)
 			{
 				pge->DrawRotatedDecal(
-					position * scale + adjustedPosition,
+					position * Scale + adjustedPosition,
 					decBurner.get(),
 					angle + 0.5f * PI,
 					olc::vf2d(-25.0f, -15.0f),
-					olc::vf2d(0.2f, 0.5f)* scale);
+					olc::vf2d(0.2f, 0.5f)* Scale);
 
 				sideBurnerTime -= fElapsedTime;
 			}
@@ -171,7 +171,7 @@ void Player::HandleLanding(
 {
 	float segmentAngle       = _Terrain->GetGroundAngle(segment.leftNode, segment.rightNode);
 	static bool statsUpdated = false;
-    paused                   = true;
+    Paused                   = true;
 	
 	// Successful landing
 	if (LandingSuccessful(segment, segmentAngle))
@@ -180,7 +180,7 @@ void Player::HandleLanding(
 		
 		_Audio->PlaySoundSample(pge, 3, 3);
 		
-		// This is slightly innacurate sometimes, but I don't care
+		// This is slightly inaccurate sometimes, but I don't care
 		if (!statsUpdated)
 		{
 			static double t = 1.0;
@@ -203,7 +203,7 @@ void Player::HandleLanding(
 
 			// Launch player based on ground angle
 			this->velocity  = { -cos(angle + HALF_PI) * 90.0f, -sin(angle + HALF_PI) * 90.0f };
-			paused          = false;
+			Paused          = false;
 			statsUpdated    = false;
 			segment.visited = true;
 			landings++;
@@ -224,9 +224,7 @@ void Player::HandleLanding(
 			this->Reset();
 			_Background->Reset();
 			_Terrain->Reset();
-			adjustedPosition = position * 0.5f;
-			scale            = 0.5f;
-			paused           = false;
+			Paused           = false;
 		}
 	}
 }
@@ -236,7 +234,7 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio
 	if (fuel > 2250.0f)
 		fuel = 2250.0f;
 
-	if (!paused)
+	if (!Paused)
 	{
 
 		// Divide by 3 for believable velocity, this is what's displayed
@@ -276,15 +274,15 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio
 	// Shift to change zoom
 	if (pge->GetKey(olc::SHIFT).bPressed)
 	{
-		if (scale == 1.5f)
+		if (Scale == 1.5f)
 		{
-			scale = 0.5f;
+			Scale = 0.5f;
 			// Adjusted position so everything keeps relative position
 			adjustedPosition = position * 0.5f; 
 		}
 		else
 		{
-			scale = 1.5f;
+			Scale = 1.5f;
 			adjustedPosition = position * -0.5f;
 		}
 	}
@@ -304,21 +302,22 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio
 
 void Player::Reset()
 {
-	angle    = 0.0f;
-	position = { (float)SCREEN_WIDTH / 2, (float)SCREEN_HEIGHT / 2 };
-	velocity = { 0.0f, 0.7f };
-	thrust   = 0.0f;
-	score    = 0;
-	fuel     = 2250;
-	landings = 0;
-	dead     = false;
+	adjustedPosition = position * 0.5f;
+	Scale            = 0.5f;
+	angle            = 0.0f;
+	velocity         = { 0.0f, 0.7f };
+	thrust           = 0.0f;
+	score            = 0;
+	fuel             = 2250;
+	landings         = 0;
+	dead             = false;
 }
 
 bool Player::LandingSuccessful(sSegment& segment, float segmentAngle)
 {
 	return (normHorVel                <= 3      &&
-            normVerVel                <= 2      &&
-            abs(angle)                <= 0.349f && // 20 degrees
-            abs(angle - segmentAngle) <= 0.087f && // 5 degrees
-	        !segment.visited);
+		    normVerVel                <= 2      &&
+		    abs(angle)                <= 0.349f && // 20 degrees
+		    abs(angle - segmentAngle) <= 0.087f && // 5 degrees
+		    !segment.visited);
 }

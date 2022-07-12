@@ -50,12 +50,12 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* _Player, FileHandler* _F
 	}
 
 	// Distinguish between ESC-pause and landed-pause
-	if (paused && (int)_Player->altitude)
+	if (Paused && (int)_Player->altitude)
 		pge->DrawStringDecal({ int(SCREEN_WIDTH * 0.33f), int(SCREEN_HEIGHT * 0.7f) }, "         PAUSED\n\nPress SPACE to continue!");
 
 	const std::vector<std::pair<olc::vf2d, std::string>> ui = 
 	{
-		{ _Player->position * scale + _Player->adjustedPosition,    std::to_string((int)_Player->altitude) + "m" }, 
+		{ _Player->position * Scale + _Player->adjustedPosition,    std::to_string((int)_Player->altitude) + "m" }, 
 		{ {SCREEN_WIDTH * 0.03f, SCREEN_HEIGHT * 0.030f}, "H.V. " + std::to_string(_Player->normHorVel) + "m/s" },
 		{ {SCREEN_WIDTH * 0.03f, SCREEN_HEIGHT * 0.055f}, "V.V. " + std::to_string(_Player->normVerVel) + "m/s" },
 		{ {SCREEN_WIDTH * 0.88f, SCREEN_HEIGHT * 0.030f}, "S "    + std::to_string((int)_Player->score)},
@@ -68,13 +68,13 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* _Player, FileHandler* _F
 			pge->DrawStringDecal(line.first, line.second, olc::GREY);
 		else
 			if (!_Player->dead)
-				pge->DrawRotatedStringDecal(line.first, line.second, _Player->angle, { -10.0f, 10.0f }, olc::GREY, olc::vf2d(1.0f, 1.0f) * scale);
+				pge->DrawRotatedStringDecal(line.first, line.second, _Player->angle, { -10.0f, 10.0f }, olc::GREY, olc::vf2d(1.0f, 1.0f) * Scale);
 	}
 
-	if (paused && !_Player->dead && _Player->altitude < 0.7f)
+	if (Paused && !_Player->dead && _Player->altitude < 0.7f)
 		LandingMessages(pge, _Player->normHorVel + _Player->normVerVel, _Player->gainedScore);
 
-	if (paused && _Player->dead)
+	if (Paused && _Player->dead)
 		DeathMessages(pge, _FileHandler, _Player->normHorVel + _Player->normVerVel, (int)_Player->score);
 }
 
@@ -87,7 +87,7 @@ void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* _Background, 
 		{ { SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.075f }, "W,A,D - Thrusters" },
 		{ { SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.100f }, "SHIFT - Zoom" },
 		{ { SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.125f }, "ESC   - Pause" },
-		{ { SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.150f }, "TAB   - Cycle Colors" },
+		/*{ { SCREEN_WIDTH * 0.05f, SCREEN_HEIGHT * 0.150f }, "TAB   - Cycle Colors" },*/
 		{ { SCREEN_WIDTH * 0.35f, SCREEN_HEIGHT * 0.800f }, "Press SPACE to start!" }
 	};
 
@@ -181,10 +181,10 @@ void Interface::FuelGauge(olc::PixelGameEngine* pge, Player* _Player)
 
 void Interface::Comms(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTime)
 {
-	static float   _time = 0.0f;
-	static float   randomTime = RandFloat(50.0f, 70.0f);
+	static float   _time              = 0.0f;
+	static float   randomTime         = RandFloat(50.0f, 70.0f);
 	static bool    randomVariablesSet = false;
-	static bool    isMessageOnScreen = false;
+	static bool    isMessageOnScreen  = false;
 	static uint8_t randomControlQuestion;
 	static uint8_t randomCrewReponse;
 	static uint8_t randomCrewChatter;
@@ -201,7 +201,7 @@ void Interface::Comms(olc::PixelGameEngine* pge, Player* _Player, float fElapsed
 		randomVariablesSet    = true;
 	}
 
-	if (!paused)
+	if (!Paused)
 		_time += fElapsedTime;
 
 	// Allow messsages in ESC-pause, but not landed-pause

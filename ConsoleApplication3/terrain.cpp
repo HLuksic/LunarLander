@@ -35,16 +35,16 @@ void Terrain::Spawn(Player* _Player)
 
 	// If the front or back segments' outer node (last point of terrain) 
 	// is on screen, spawn a new segment
-	if (deqFgSegments.back().leftNode.x > _Player->position.x - (float)SCREEN_WIDTH / (2 * scale))
+	if (deqFgSegments.back().leftNode.x > _Player->position.x - (float)SCREEN_WIDTH / (2 * Scale))
 		CreateNewSegment(&deqFgSegments, true, { 30.0f, 50.0f }, { -50.0f, 50.0f });
 
-	if (deqFgSegments.front().rightNode.x < _Player->position.x + (float)SCREEN_WIDTH / (2 * scale))
+	if (deqFgSegments.front().rightNode.x < _Player->position.x + (float)SCREEN_WIDTH / (2 * Scale))
 		CreateNewSegment(&deqFgSegments, false, { 30.0f, 50.0f }, { -50.0f, 50.0f });
 
-	if (deqBgSegments.back().leftNode.x > _Player->position.x - (float)SCREEN_WIDTH / (2 * scale))
+	if (deqBgSegments.back().leftNode.x > _Player->position.x - (float)SCREEN_WIDTH / (2 * Scale))
 		CreateNewSegment(&deqBgSegments, true, { 15.0f, 25.0f }, { -15.0f, 15.0f });
 
-	if (deqBgSegments.front().rightNode.x < _Player->position.x + (float)SCREEN_WIDTH / (2 * scale))
+	if (deqBgSegments.front().rightNode.x < _Player->position.x + (float)SCREEN_WIDTH / (2 * Scale))
 		CreateNewSegment(&deqBgSegments, false, { 15.0f, 25.0f }, { -15.0f, 15.0f });
 }
 
@@ -88,56 +88,56 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTim
 	for (auto& segment : deqBgSegments)
 	{
 		// Terrain moves inversely to player
-		if (!paused)
+		if (!Paused)
 		{
 			segment.leftNode  += _Player->velocity * -0.5f * fElapsedTime;
 			segment.rightNode += _Player->velocity * -0.5f * fElapsedTime;
 		}
 
 		// Cull offscreen segments
-		if (segment.leftNode.x  < _Player->position.x + (float)SCREEN_WIDTH / (2 * scale) &&
-			segment.rightNode.x > _Player->position.x - (float)SCREEN_WIDTH / (2 * scale))
+		if (segment.leftNode.x  < _Player->position.x + (float)SCREEN_WIDTH / (2 * Scale) &&
+			segment.rightNode.x > _Player->position.x - (float)SCREEN_WIDTH / (2 * Scale))
 			pge->DrawWarpedDecal(
 				decSurface.get(),
 				{ 
-					segment.leftNode * scale  + _Player->adjustedPosition,
-					segment.rightNode * scale + _Player->adjustedPosition,
-					olc::vf2d(segment.rightNode.x, segment.rightNode.y + 300.0f) * scale + _Player->adjustedPosition,
-					olc::vf2d(segment.leftNode.x,  segment.leftNode.y + 300.0f) * scale + _Player->adjustedPosition 
+					segment.leftNode * Scale  + _Player->adjustedPosition,
+					segment.rightNode * Scale + _Player->adjustedPosition,
+					olc::vf2d(segment.rightNode.x, segment.rightNode.y + 300.0f) * Scale + _Player->adjustedPosition,
+					olc::vf2d(segment.leftNode.x,  segment.leftNode.y + 300.0f) * Scale + _Player->adjustedPosition 
 				},
 				olc::VERY_DARK_GREY);
 	}
 
 	for (auto& segment : deqFgSegments)
 	{
-		if (!paused)
+		if (!Paused)
 		{
 			segment.leftNode  += _Player->velocity * -1.0f * fElapsedTime;
 			segment.rightNode += _Player->velocity * -1.0f * fElapsedTime;
 		}
 
-		if (segment.leftNode.x  < _Player->position.x + (float)SCREEN_WIDTH / (2 * scale) &&
-			segment.rightNode.x > _Player->position.x - (float)SCREEN_WIDTH / (2 * scale))
+		if (segment.leftNode.x  < _Player->position.x + (float)SCREEN_WIDTH / (2 * Scale) &&
+			segment.rightNode.x > _Player->position.x - (float)SCREEN_WIDTH / (2 * Scale))
 		{
 			// Landable segments are WHITE, non-landable are DARK_GREY
 			if (abs(GetGroundAngle(segment.leftNode, segment.rightNode)) <= 0.349f && !segment.visited)
 				pge->DrawWarpedDecal(
 					decSurface.get(),
 					{
-						segment.leftNode  * scale + _Player->adjustedPosition,
-						segment.rightNode * scale + _Player->adjustedPosition,
-						olc::vf2d(segment.rightNode.x, segment.rightNode.y + 500.0f) * scale + _Player->adjustedPosition,
-						olc::vf2d(segment.leftNode.x,  segment.leftNode.y + 500.0f) * scale + _Player->adjustedPosition
+						segment.leftNode  * Scale + _Player->adjustedPosition,
+						segment.rightNode * Scale + _Player->adjustedPosition,
+						olc::vf2d(segment.rightNode.x, segment.rightNode.y + 500.0f) * Scale + _Player->adjustedPosition,
+						olc::vf2d(segment.leftNode.x,  segment.leftNode.y + 500.0f) * Scale + _Player->adjustedPosition
 					},
 					olc::WHITE);
 			else
 				pge->DrawWarpedDecal(
 					decSurface.get(),
 					{
-						segment.leftNode  * scale + _Player->adjustedPosition,
-						segment.rightNode * scale + _Player->adjustedPosition,
-						olc::vf2d(segment.rightNode.x, segment.rightNode.y + 500.0f) * scale + _Player->adjustedPosition,
-						olc::vf2d(segment.leftNode.x,  segment.leftNode.y + 500.0f) * scale + _Player->adjustedPosition
+						segment.leftNode  * Scale + _Player->adjustedPosition,
+						segment.rightNode * Scale + _Player->adjustedPosition,
+						olc::vf2d(segment.rightNode.x, segment.rightNode.y + 500.0f) * Scale + _Player->adjustedPosition,
+						olc::vf2d(segment.leftNode.x,  segment.leftNode.y + 500.0f) * Scale + _Player->adjustedPosition
 					},
 					olc::DARK_GREY);
 		}

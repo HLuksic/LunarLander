@@ -49,8 +49,8 @@ public:
 		_Interface   = new Interface;
 		_Background  = new Background;
 		_FileHandler = new FileHandler;
-		paused       = false;
-		scale        = 0.5f;
+		Paused       = false;
+		Scale        = 0.5f;
 
 		olc::SOUND::InitialiseAudio();
 
@@ -72,10 +72,10 @@ public:
 		}*/
 
 		if (GetKey(olc::ESCAPE).bPressed)
-			paused = true;
+			Paused = true;
 
 		if (GetKey(olc::SPACE).bPressed)
-			paused = false;
+			Paused = false;
 
 		if (_Interface->titleScreen)
 			_Interface->TitleScreen(this, _Background, _Player, _FileHandler, _Audio);

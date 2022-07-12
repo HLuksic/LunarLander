@@ -16,13 +16,13 @@ void Terrain::CreateNewSegment(T terrain, bool left, olc::vf2d distanceX, olc::v
 	// New rightNode is the previous back() segments leftNode
 	// New leftNode is random with regard to previous back() segments leftNode
 
-	olc::vf2d newLeftNode  = left ? olc::vf2d(terrain->back().leftNode.x - RandFloat(distanceX.x, distanceX.y),
-                                              terrain->back().leftNode.y + RandFloat(distanceY.x, distanceY.y)) : 
+	olc::vf2d newLeftNode  = left ? olc::vf2d(terrain->back().leftNode.x - RandInRange(distanceX.x, distanceX.y),
+                                              terrain->back().leftNode.y + RandInRange(distanceY.x, distanceY.y)) :
                                     terrain->front().rightNode;
 
 	olc::vf2d newRightNode = left ? terrain->back().leftNode :
-                                    olc::vf2d(terrain->front().rightNode.x + RandFloat(distanceX.x, distanceX.y),
-                                              terrain->front().rightNode.y + RandFloat(distanceY.x, distanceY.y));
+                                    olc::vf2d(terrain->front().rightNode.x + RandInRange(distanceX.x, distanceX.y),
+                                              terrain->front().rightNode.y + RandInRange(distanceY.x, distanceY.y));
 
 	left ? terrain->push_back( { false, newLeftNode, newRightNode }) :
            terrain->push_front({ false, newLeftNode, newRightNode });
@@ -148,13 +148,13 @@ void Terrain::SpawnInitialNodes(Player* _Player)
 {
 	deqFgSegments.push_back({ 
 		false, 
-		{ _Player->position.x - 20.0f, RandFloat(SCREEN_HEIGHT * 1.4f, SCREEN_HEIGHT * 1.5f) },
-		{ _Player->position.x + 20.0f, RandFloat(SCREEN_HEIGHT * 1.4f, SCREEN_HEIGHT * 1.5f) } });
+		{ _Player->position.x - 20.0f, RandInRange(SCREEN_HEIGHT * 1.4f, SCREEN_HEIGHT * 1.5f) },
+		{ _Player->position.x + 20.0f, RandInRange(SCREEN_HEIGHT * 1.4f, SCREEN_HEIGHT * 1.5f) } });
 
 	deqBgSegments.push_back({ 
 		false,
-		{ _Player->position.x - 7.0f, RandFloat(SCREEN_HEIGHT * 0.95f, SCREEN_HEIGHT * 1.0f) },
-		{ _Player->position.x + 7.0f, RandFloat(SCREEN_HEIGHT * 0.95f, SCREEN_HEIGHT * 1.0f) } });
+		{ _Player->position.x - 7.0f, RandInRange(SCREEN_HEIGHT * 0.95f, SCREEN_HEIGHT * 1.0f) },
+		{ _Player->position.x + 7.0f, RandInRange(SCREEN_HEIGHT * 0.95f, SCREEN_HEIGHT * 1.0f) } });
 }
 
 float Terrain::GetGroundAngle(olc::vf2d node1, olc::vf2d node2)

@@ -182,7 +182,7 @@ void Interface::FuelGauge(olc::PixelGameEngine* pge, Player* _Player)
 void Interface::Comms(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTime)
 {
 	static float   _time              = 0.0f;
-	static float   randomTime         = RandFloat(50.0f, 70.0f);
+	static float   randomTime         = RandInRange(50.0f, 70.0f);
 	static bool    randomVariablesSet = false;
 	static bool    isMessageOnScreen  = false;
 	static uint8_t randomControlQuestion;
@@ -221,7 +221,7 @@ void Interface::Comms(olc::PixelGameEngine* pge, Player* _Player, float fElapsed
 			if (_time > randomTime + 8.0f)
 			{
 				randomVariablesSet = false;
-				randomTime         = RandFloat(50.0f, 70.0f);
+				randomTime         = RandInRange(50.0f, 70.0f);
 				_time              = 0.0f;
 			}
 		}

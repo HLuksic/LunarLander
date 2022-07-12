@@ -10,6 +10,6 @@ public:
 	std::string  highScore;
 
 public:
-	int ReadOrCreateFile();
+	std::string ReadOrCreateFile();
 	void OverwriteScore(uint32_t score);
 };

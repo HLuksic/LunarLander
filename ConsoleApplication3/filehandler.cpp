@@ -2,7 +2,7 @@
 #include <string>
 #include "filehandler.h"
 
-int FileHandler::ReadOrCreateFile()
+std::string FileHandler::ReadOrCreateFile()
 {
 	file.open("highscore.txt", std::ios::in);
 
@@ -12,13 +12,13 @@ int FileHandler::ReadOrCreateFile()
 		file.close();
 		file.clear();
 
-		return std::atoi(highScore.c_str());
+		return highScore;
 	}
 
 	file.close();
 	file.clear();
 
-	return -1;
+	return "0";
 }
 
 void FileHandler::OverwriteScore(uint32_t score)

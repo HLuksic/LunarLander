@@ -173,7 +173,7 @@ void Player::HandleLanding(olc::PixelGameEngine* pge, sSegment& segment,
 	{
 		gainedScore = int(50 + abs(segmentAngle) * 544 * (5 - (normHorVel + normVerVel)));
 		
-		_Audio->PlaySoundSample(pge, 3, 3);
+		_Audio->PlaySampleOnce(pge, 3, 3);
 		
 		// This is slightly inaccurate sometimes, but I don't care
 		if (!statsUpdated)
@@ -193,33 +193,41 @@ void Player::HandleLanding(olc::PixelGameEngine* pge, sSegment& segment,
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
 		{
 			_Audio->soundPlayed = false;
-			_Audio->PlaySoundSample(pge, 1, 2);
+			_Audio->PlaySampleOnce(pge, 1, 2);
 			_Audio->soundPlayed = false;
 
 			// Launch player based on ground angle
-			this->velocity  = { -cos(angle + HALF_PI) * 90.0f, -sin(angle + HALF_PI) * 90.0f };
+			velocity        = { -cos(angle + HALF_PI) * 90.0f, -sin(angle + HALF_PI) * 90.0f };
 			Paused          = false;
 			statsUpdated    = false;
 			segment.visited = true;
 			landings++;
+
+			// Safeguard against huge deques
+			if (score > 10000)
+			{
+				velocity = { 0.0f, 0.0f };
+				_Terrain->deqBgSegments.clear();
+				_Terrain->deqFgSegments.clear();
+			}
 		}
 	}
 	else
 	{
 		dead = true;
 
-		_Audio->PlaySoundSample(pge, 2, 9);
+		_Audio->PlaySampleOnce(pge, 2, 9);
 
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
 		{
 			_Audio->soundPlayed = false;
-			_Audio->PlaySoundSample(pge, 1, 11);
+			_Audio->PlaySampleOnce(pge, 1, 11);
 			_Audio->soundPlayed = false;
 
 			this->Reset();
 			_Background->Reset();
 			_Terrain->Reset();
-			Paused           = false;
+			Paused = false;
 		}
 	}
 }
@@ -231,13 +239,12 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio
 
 	if (!Paused)
 	{
-
 		// Divide by 3 for believable velocity, this is what's displayed
 		normHorVel = abs((int)(velocity.x / 3));
 		normVerVel = abs((int)(velocity.y / 3));
 
 		// Angle reset if full circle
-		if (abs(angle) > 6.283f) angle = 0.0f;
+		if (abs(angle) > DegToRad(360.0f)) angle = 0.0f;
 
 		// Directional velocity
 		velocity += { thrust * cos(angle + PI * 0.5f) * fElapsedTime, thrust * sin(angle + PI * 0.5f) * fElapsedTime };
@@ -289,7 +296,7 @@ void Player::Physics(olc::PixelGameEngine* pge, Terrain* _Terrain, Audio* _Audio
 
 	if ((int)fuel < 500.0f && !lowFuelSoundPlayed)
 	{
-		_Audio->PlaySoundSample(pge, 1, 12);
+		_Audio->PlaySampleOnce(pge, 1, 12);
 		_Audio->soundPlayed = false;
 		lowFuelSoundPlayed  = true;
 	}
@@ -310,9 +317,9 @@ void Player::Reset()
 
 bool Player::LandingSuccessful(sSegment& segment, float segmentAngle)
 {
-	return (normHorVel                <= 3      &&
-	        normVerVel                <= 2      &&
-	        abs(angle)                <= 0.349f && // 20 degrees
-	        abs(angle - segmentAngle) <= 0.087f && // 5 degrees
+	return (normHorVel                <= 3               &&
+	        normVerVel                <= 2               &&
+	        abs(angle)                <= DegToRad(20.0f) &&
+	        abs(angle - segmentAngle) <= DegToRad(5.0f)  &&
 	        !segment.visited);
 }

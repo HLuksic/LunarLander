@@ -76,9 +76,9 @@ void Terrain::HandleCollision(olc::PixelGameEngine* pge, Player* _Player, Backgr
 
 void Terrain::Draw(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTime)
 {
-	// Yes, this approach slows down as the number of total segments increases,
-	// but I can't think of a reasonably simple way to mitigate this. 
-	// The performance impact isn't terrible anyway.
+	//pge->DrawStringDecal({ 40.0f, 40.0f }, "Terrain size: " + std::to_string((deqBgSegments.size() + deqFgSegments.size()) * sizeof(sSegment)) + " Bytes");
+
+	// std::deque is non-contiguous, but allows fast pushing to front and back
 	for (auto& segment : deqBgSegments)
 	{
 		// Terrain moves inversely to player
@@ -140,6 +140,8 @@ void Terrain::Draw(olc::PixelGameEngine* pge, Player* _Player, float fElapsedTim
 
 void Terrain::Reset()
 {
+	// Terrain generation is handled automatically, so it's 
+	// enough to simply clear the deques to get fresh terrain
 	deqFgSegments.clear();
 	deqBgSegments.clear();
 }

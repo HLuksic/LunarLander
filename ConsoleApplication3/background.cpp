@@ -11,7 +11,7 @@ Background::Background()
 
 void Background::Draw(olc::PixelGameEngine* pge, Player* _Player)
 {
-	for (auto& star : vecStars)
+	for (const auto& star : vecStars)
 		pge->DrawCircle(star.position * Scale + _Player->adjustedPosition, 1 * int(Scale), olc::Pixel(255, 255, 255, star.lightIntensity));
 
 	pge->DrawDecal(earthPos * Scale + _Player->adjustedPosition, decEarth.get(), { Scale * 2, Scale * 2 });
@@ -20,11 +20,12 @@ void Background::Draw(olc::PixelGameEngine* pge, Player* _Player)
 void Background::Reset()
 {
 	vecStars.clear();
+	sStar star;
 
-	for (int i = 0; i < 100; i++)
+	int i = 100;
+	while (i --> 0) // Evil operator
 	{
-		sStar star;
-		star.position = olc::vf2d(RandInRange(-250.0f, 800.0f), RandInRange(-140.0f, 310.0f));
+		star.position       = olc::vf2d(RandInRange(-250.0f, 800.0f), RandInRange(-140.0f, 310.0f));
 		star.lightIntensity = uint8_t(RandInRange(0.0f, 255.0f));
 
 		vecStars.push_back(star);

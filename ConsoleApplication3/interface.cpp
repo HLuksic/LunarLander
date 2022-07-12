@@ -53,7 +53,7 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* _Player, FileHandler* _F
 	if (Paused && (int)_Player->altitude)
 		pge->DrawStringDecal({ int(SCREEN_WIDTH * 0.33f), int(SCREEN_HEIGHT * 0.7f) }, "         PAUSED\n\nPress SPACE to continue!");
 
-	static const std::vector<std::pair<olc::vf2d, std::string>> ui = 
+	const std::vector<std::pair<olc::vf2d, std::string>> ui = 
 	{
 		{ _Player->position * Scale + _Player->adjustedPosition,    std::to_string((int)_Player->altitude) + "m" }, 
 		{ {SCREEN_WIDTH * 0.03f, SCREEN_HEIGHT * 0.030f}, "H.V. " + std::to_string(_Player->normHorVel) + "m/s" },
@@ -62,7 +62,7 @@ void Interface::Draw(olc::PixelGameEngine* pge, Player* _Player, FileHandler* _F
 		{ {SCREEN_WIDTH * 0.88f, SCREEN_HEIGHT * 0.055f}, "L "    + std::to_string(_Player->landings) }
 	};
 
-	for (auto& line : ui)
+	for (const auto& line : ui)
 	{
 		if (line != ui.front())
 			pge->DrawStringDecal(line.first, line.second, olc::GREY);
@@ -91,7 +91,7 @@ void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* _Background, 
 		{ { SCREEN_WIDTH * 0.35f, SCREEN_HEIGHT * 0.800f }, "Press SPACE to start!" }
 	};
 
-	for (auto& line : ui)
+	for (const auto& line : ui)
 	{
 		if (line != ui.front())
 			pge->DrawStringDecal(line.first, line.second, olc::GREY);
@@ -99,10 +99,9 @@ void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* _Background, 
 			pge->DrawStringDecal(line.first, line.second, olc::WHITE, { 3.0f, 3.0f });
 	}
 
-	int highScore = _FileHandler->ReadOrCreateFile();
+	std::string highScore = _FileHandler->ReadOrCreateFile();
 
-	if (highScore != -1)
-		pge->DrawStringDecal({ SCREEN_WIDTH * 0.375f, SCREEN_HEIGHT * 0.9f }, "High score: " + std::to_string(highScore), olc::GREY);
+	pge->DrawStringDecal({ SCREEN_WIDTH * 0.375f, SCREEN_HEIGHT * 0.9f }, "High score: " + highScore, olc::GREY);
 
 	pge->DrawDecal({ 430, 30 }, _Background->decEarth.get(), { 3.0f, 3.0f });
 	pge->DrawRotatedDecal({ SCREEN_WIDTH * 0.52f, SCREEN_HEIGHT * 0.55f }, _Player->decPlayer.get(), 0.4f, { 8.0f, 8.0f }, { 7.0f, 7.0f });
@@ -111,7 +110,7 @@ void Interface::TitleScreen(olc::PixelGameEngine* pge, Background* _Background, 
 	{
 		titleScreen = false;
 		_Audio->soundPlayed = false;
-		_Audio->PlaySoundSample(pge, 1, 11);
+		_Audio->PlaySampleOnce(pge, 1, 11);
 		_Audio->soundPlayed = false;
 	}
 }
@@ -149,9 +148,9 @@ void Interface::LandingMessages(olc::PixelGameEngine* pge, uint16_t totalVelocit
 
 void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* _FileHandler, uint16_t totalVelocity, uint32_t currentScore)
 {
-	uint32_t highScore = _FileHandler->ReadOrCreateFile();
+	uint32_t highScore = atoi(_FileHandler->ReadOrCreateFile().c_str());
 
-	if (highScore == -1 || highScore < currentScore)
+	if (highScore < currentScore)
 		_FileHandler->OverwriteScore(currentScore);
 	else if (highScore == currentScore)
 		pge->DrawStringDecal({ int(SCREEN_WIDTH * 0.4f), int(SCREEN_HEIGHT * 0.3f) }, "NEW HIGH SCORE!");
@@ -170,8 +169,8 @@ void Interface::DeathMessages(olc::PixelGameEngine* pge, FileHandler* _FileHandl
 
 void Interface::FuelGauge(olc::PixelGameEngine* pge, Player* _Player)
 {
-	float size      = ((_Player->fuel / 2250) * 20.0f);
-	float position  = SCREEN_WIDTH * 0.32f + 10.0f * size + 5.0f;
+	float size     = ((_Player->fuel / 2250) * 20.0f);
+	float position = SCREEN_WIDTH * 0.32f + 10.0f * size + 5.0f;
 
 	pge->DrawDecal(      { SCREEN_WIDTH * 0.317f, SCREEN_HEIGHT * 0.948f }, decBar.get(), { 20.3f, 0.9f }, olc::VERY_DARK_GREY);
 	pge->DrawDecal(      { SCREEN_WIDTH * 0.320f, SCREEN_HEIGHT * 0.952f }, decBar.get(), { size, 0.5f }, olc::GREY);

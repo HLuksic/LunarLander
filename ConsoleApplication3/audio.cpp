@@ -35,7 +35,7 @@ void Audio::Play(olc::PixelGameEngine* pge, Player* _Player)
 		olc::SOUND::StopSample(soundSamples[1]);
 }
 
-void::Audio::PlaySoundSample(olc::PixelGameEngine* pge, uint8_t a, uint8_t b)
+void::Audio::PlaySampleOnce(olc::PixelGameEngine* pge, uint8_t a, uint8_t b)
 {
 	if (!soundPlayed)
 	{

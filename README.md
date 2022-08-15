@@ -11,7 +11,7 @@ The game is mostly finished, only missing a few sounds.
 
 - WAD - Thrust and rotation
 - Shift - Zoom
-- Space - Launch
+- Space - Launch / restart
 - ESC - Pause
 
 ## Other tools used

@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# High score file
+highscore.txt
+
 # User-specific files
 *.rsuser
 *.suo

@@ -34,46 +34,53 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 	static float sideBurnerTime = 0.0f;
 
 	if (!dead)
+	{
 		pge->DrawRotatedDecal(
 			position * Scale + adjustedPosition,
 			decPlayer.get(),
 			angle,
 			olc::vf2d(8.0f, 8.0f),
 			olc::vf2d(1.0f, 1.0f) * Scale);
+	}
 	else
 	{
 		// Different levels of damage decals
 		if (normHorVel + normVerVel < 7)
+		{
 			pge->DrawRotatedDecal(
 				position * Scale + adjustedPosition,
 				decPlayerLightDamage.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
 				olc::vf2d(1.0f, 1.0f) * Scale);
-
+		}
 		else if (normHorVel + normVerVel < 10)
+		{
 			pge->DrawRotatedDecal(
 				position * Scale + adjustedPosition,
 				decPlayerMediumDamage.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
 				olc::vf2d(1.0f, 1.0f) * Scale);
-
+		}
 		else if (normHorVel + normVerVel < 13)
+		{
 			pge->DrawRotatedDecal(
 				position * Scale + adjustedPosition,
 				decPlayerHeavyDamage.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
 				olc::vf2d(1.0f, 1.0f) * Scale);
-		
-		else if (normHorVel + normVerVel > 12)
+		}
+		else
+		{
 			pge->DrawRotatedDecal(
 				position * Scale + adjustedPosition,
 				decPlayerDestroyed.get(),
 				currentSegmentAngle,
 				olc::vf2d(8.0f, 8.0f),
 				olc::vf2d(1.0f, 1.0f) * Scale);
+		}
 	}
 
 	if ((int)fuel && !Paused)
@@ -83,9 +90,11 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 			mainBurnerTime += fElapsedTime;
 
 			if (mainBurnerTime > 1.0f)
+			{
 				mainBurnerTime = 1.0f;
+			}
 
-			// Using sin() and time here for burner growth effect
+			// Using sine and time here for exhaust growth effect
 			pge->DrawRotatedDecal(
 				position * Scale + adjustedPosition,
 				decBurner.get(),
@@ -97,17 +106,21 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 		{
 			// Short burnoff effect
 			if (mainBurnerTime > 0.0f)
+			{
 				pge->DrawRotatedDecal(
 					position * Scale + adjustedPosition,
 					decEnd.get(),
 					angle,
 					olc::vf2d(8.0f, -5.0f),
 					olc::vf2d(2.0f + abs(sin(mainBurnerTime) * 3.0f), 1.5f) * Scale);
+			}
 
 			mainBurnerTime -= fElapsedTime * 10;
 
 			if (mainBurnerTime < 0.0f)
+			{
 				mainBurnerTime = 0.0f;
+			}
 		}
 
 		// Side thrusters
@@ -161,34 +174,17 @@ void Player::Draw(olc::PixelGameEngine* pge, float fElapsedTime)
 	}
 }
 
-void Player::HandleLanding(olc::PixelGameEngine* pge, sSegment& segment, 
+void Player::HandleLanding(olc::PixelGameEngine* pge, Segment& segment, 
 	Background* _Background, Terrain* _Terrain, Audio* _Audio, float fElapsedTime)
 {
-	float segmentAngle       = _Terrain->GetGroundAngle(segment.leftNode, segment.rightNode);
 	static bool statsUpdated = false;
-    Paused                   = true;
+	float segmentAngle = _Terrain->GetGroundAngle(segment.leftNode, segment.rightNode);
+    Paused             = true;
 	
-	// Successful landing
 	if (LandingSuccessful(segment, segmentAngle))
 	{
-		gainedScore = int(50 + abs(segmentAngle) * 544 * (5 - (normHorVel + normVerVel)));
-		
 		_Audio->PlaySampleOnce(pge, 3, 3);
-		
-		// This is slightly inaccurate sometimes, but I don't care
-		if (!statsUpdated)
-		{
-			static double t = 1.0;
-			t              -= fElapsedTime;
-			score          += gainedScore * fElapsedTime;
-			fuel           += 500.0f * fElapsedTime;
-
-			if (t <= 0.0)
-			{
-				t = 1.0;
-				statsUpdated = true;
-			}
-		}
+		UpdateScore(segmentAngle, statsUpdated, fElapsedTime);
 
 		if (pge->GetKey(olc::Key::SPACE).bPressed)
 		{
@@ -203,7 +199,7 @@ void Player::HandleLanding(olc::PixelGameEngine* pge, sSegment& segment,
 			segment.visited = true;
 			landings++;
 
-			// Safeguard against huge deques
+			// Reset terrain at high score to prevent huge deque
 			if (score > 10000)
 			{
 				velocity = { 0.0f, 0.0f };
@@ -228,6 +224,28 @@ void Player::HandleLanding(olc::PixelGameEngine* pge, sSegment& segment,
 			_Background->Reset();
 			_Terrain->Reset();
 			Paused = false;
+		}
+	}
+}
+
+void Player::UpdateScore(float segmentAngle, bool& statsUpdated, float fElapsedTime)
+{
+	
+	// Calculate score based on angle of terrain and angle of landing, max. 1000
+	gainedScore = int(50 + abs(segmentAngle) * 544 * (5 - (normHorVel + normVerVel)));
+
+	// This is slightly inaccurate sometimes, but I don't care
+	if (!statsUpdated)
+	{
+		static double t = 1.0;
+		t -= fElapsedTime;
+		score += gainedScore * fElapsedTime;
+		fuel += 500.0f * fElapsedTime;
+
+		if (t <= 0.0)
+		{
+			t = 1.0;
+			statsUpdated = true;
 		}
 	}
 }
@@ -315,7 +333,7 @@ void Player::Reset()
 	dead             = false;
 }
 
-bool Player::LandingSuccessful(sSegment& segment, float segmentAngle)
+bool Player::LandingSuccessful(Segment& segment, float segmentAngle)
 {
 	return (normHorVel                <= 3               &&
 	        normVerVel                <= 2               &&

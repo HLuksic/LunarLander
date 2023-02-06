@@ -9,7 +9,7 @@ class Background;
 class FileHandler;
 class Audio;
 
-struct sSegment 
+struct Segment 
 {
 	bool      visited;
 	olc::vf2d leftNode;
@@ -22,8 +22,8 @@ public:
 	Terrain();
 
 public:
-	std::deque<sSegment> deqFgSegments;
-	std::deque<sSegment> deqBgSegments;
+	std::deque<Segment> deqFgSegments;
+	std::deque<Segment> deqBgSegments;
 private:
 	std::unique_ptr<olc::Sprite> sprSurface;
 	std::unique_ptr<olc::Decal>  decSurface;

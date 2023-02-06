@@ -4,7 +4,7 @@
 #include "player.h"
 #include "audio.h"
 
-struct sSegment;
+struct Segment;
 class Background;
 class FileHandler;
 
